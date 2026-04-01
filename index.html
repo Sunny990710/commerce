@@ -528,7 +528,7 @@ function SidebarNav({ active, onChange }) {
   const items = [
     { id: 'HOME', icon: Home, label: '홈' },
     { id: 'SEARCH', icon: Search, label: '대화' },
-    { id: 'FEED', icon: Sparkles, label: 'AI 옷장' },
+    { id: 'FEED', icon: Heart, label: '옷장' },
   ];
   const navBtn = (item, compact) => {
     const isActive = active === item.id;
@@ -843,7 +843,6 @@ function App() {
   const [stylePersonaScreenOpen, setStylePersonaScreenOpen] = useState(false);
   const [personaCarouselIndex, setPersonaCarouselIndex] = useState(0);
   const chatEndRef = useRef(null);
-  const closetChatEndRef = useRef(null);
   const userMenuRef = useRef(null);
   const searchFilterRef = useRef(null);
   const homeFilterRef = useRef(null);
@@ -955,15 +954,6 @@ function App() {
     ...prev, [key]: prev[key].includes(val) ? prev[key].filter(v => v !== val) : [...prev[key], val]
   }));
 
-  // ── Closet (AI 옷장) state ──
-  const MY_CLOTHES = [
-    { id: 'my1', name: '쿨 코튼 옥스포드 셔츠', brand: 'SPAO', price: 35900, originalPrice: 49900, image: 'https://cafe24img.poxo.com/spao/web/product/small/202602/d752f9717d948d1981a4ba95cff2eb2e.jpg', category: '상의' },
-    { id: 'my2', name: '네이비 치노 팬츠', brand: 'Gap', price: 59000, originalPrice: 79000, image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=400&q=80', category: '하의' },
-    { id: 'my3', name: '에코 레더 바이커 자켓', brand: 'WHO.A.U', price: 498000, originalPrice: 698000, image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=400&q=80', category: '아우터' },
-    { id: 'my4', name: '베이직 크루넥 맨투맨', brand: 'SPAO', price: 29900, originalPrice: 39900, image: 'https://cafe24img.poxo.com/spao/web/product/small/202512/6ed586d745d78064f74d149b0762971e.gif', category: '상의' },
-    { id: 'my5', name: '플리츠 A라인 스커트', brand: 'MIXXO', price: 69000, originalPrice: 89000, image: 'https://item.elandrs.com/r/image/item/2025-05-06/3e9f64e9-36fd-4bd6-bb2b-19d879d4376f.jpg', category: '하의' },
-    { id: 'my6', name: '소프트 브이넥 니트', brand: 'ROEM', price: 59000, originalPrice: 79000, image: 'https://item.elandrs.com/r/image/item/2024-03-13/760f3c18-5b79-47f9-8519-eec2e0cf95c0.jpg', category: '상의' },
-  ];
   const WISH_CLOTHES_INIT = [
     { id: 'w1', name: '쿨링 에어 반팔 티셔츠', brand: 'SPAO', price: 19900, originalPrice: 29900, image: 'https://spao.com/web/product/big/202511/e1352c7617706f09c4a13e613875379b.jpg', category: '상의', tag: '최저가', stock: 3, colors: [{ name: '화이트', hex: '#F5F5F5', stock: 2, image: 'https://spao.com/web/product/big/202511/e1352c7617706f09c4a13e613875379b.jpg' }, { name: '블랙', hex: '#222', stock: 1, image: 'https://spao.com/web/product/big/202511/e1352c7617706f09c4a13e613875379b.jpg' }] },
     { id: 'w2', name: '라이트 데님 와이드 팬츠', brand: 'SPAO', price: 39900, originalPrice: 49900, image: 'https://spao.com/web/product/big/202509/497c1758bf7a20ccd20d6e2b8ec66d4b.jpg', category: '하의', tag: '리뷰 좋은', stock: 5, colors: [{ name: '라이트 블루', hex: '#87CEEB', stock: 3, image: 'https://spao.com/web/product/big/202509/497c1758bf7a20ccd20d6e2b8ec66d4b.jpg' }, { name: '미디엄 워시', hex: '#6B8DAE', stock: 0, image: 'https://spao.com/web/product/big/202509/497c1758bf7a20ccd20d6e2b8ec66d4b.jpg' }] },
@@ -986,162 +976,6 @@ function App() {
     setWishToast(product.name);
     setTimeout(() => { setWishToast(null); setView('FEED'); }, 1200);
   };
-  const COORDI_RECS = {
-    'my1': [
-      { name: '여성 스티브카라원피스', brand: '후아유', price: 22900, image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=300&q=80' },
-      { name: '후아유 여성 스티브 카라원피스', brand: '후아유', price: 24900, image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=300&q=80' },
-    ],
-    'my2': [
-      { name: '하이웨스트 슬랙스', brand: 'MIXXO', price: 45900, image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=300&q=80' },
-      { name: '골드 체인 네크리스', brand: 'SPAO', price: 19900, image: 'https://images.unsplash.com/photo-1515562141589-67f0d569b610?auto=format&fit=crop&w=300&q=80' },
-    ],
-    'my3': [
-      { name: '크롭 카디건', brand: 'Free People', price: 89000, image: 'https://images.unsplash.com/photo-1434389677669-e08b4cda3f8a?auto=format&fit=crop&w=300&q=80' },
-      { name: '스트랩 샌들', brand: 'New Balance', price: 59000, image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=300&q=80' },
-    ],
-    'my4': [
-      { name: '린넨 셔츠 원피스', brand: 'MIXXO', price: 69000, image: 'https://images.unsplash.com/photo-1596783074918-c84cb06531ca?auto=format&fit=crop&w=300&q=80' },
-      { name: '캔버스 스니커즈', brand: 'SPAO', price: 35000, image: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=300&q=80' },
-    ],
-    'my5': [
-      { name: '오버핏 블레이저', brand: 'Rag & Bone', price: 198000, image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=300&q=80' },
-      { name: '니트 베스트', brand: 'WHO.A.U', price: 39900, image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=300&q=80' },
-    ],
-    'my6': [
-      { name: '코튼 조거팬츠', brand: 'SPAO', price: 29900, image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=300&q=80' },
-      { name: '미니멀 크로스백', brand: 'MIXXO', price: 55000, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=300&q=80' },
-    ],
-  };
-  const [closetTab, setClosetTab] = useState('MY');
-  const [closetSelected, setClosetSelected] = useState([]);
-  const [expandedCoordi, setExpandedCoordi] = useState(null);
-  const [closetChatInput, setClosetChatInput] = useState('');
-  const [closetMessages, setClosetMessages] = useState([
-    { role: 'assistant', content: 'AI 옷장에 오신 걸 환영해요! 마이 아이템이나 위시리스트을 선택하면, 코디 추천이나 비슷한 스타일을 찾아드릴게요.' }
-  ]);
-  const [isClosetSearching, setIsClosetSearching] = useState(false);
-
-  const toggleClosetItem = (item, type) => {
-    const key = type + ':' + item.id;
-    setClosetSelected(prev => {
-      const exists = prev.find(s => s.key === key);
-      if (exists) return prev.filter(s => s.key !== key);
-      return [...prev, { key, type, ...item }];
-    });
-  };
-
-  const OUTFIT_IMAGES = [
-    'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1554412933-514a83d2f3c8?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=400&q=80',
-  ];
-
-  const handleClosetChat = async (input) => {
-    if (!input.trim() && closetSelected.length === 0) return;
-    if (isClosetSearching) return;
-    const selectedInfo = closetSelected.map(s => `[${s.type === 'MY' ? '내 옷' : '위시'}] ${s.brand} ${s.name}`).join(', ');
-    const fullInput = selectedInfo ? (input.trim() ? `${input} (선택: ${selectedInfo})` : `선택한 아이템: ${selectedInfo}`) : input;
-    const userMsg = { role: 'user', content: input.trim() || `${closetSelected.map(s => s.name).join(', ')} 관련 추천해줘` };
-    const newMsgs = [...closetMessages, userMsg];
-    setClosetMessages(newMsgs);
-    setClosetChatInput('');
-    setIsClosetSearching(true);
-
-    // Detect outfit/matching/코디 queries
-    const isOutfitQuery = /(매치|코디|어울|착장|조합|스타일링|입어|맞춰|어떻게.*입|셔츠.*바지|바지.*셔츠|상의.*하의|하의.*상의|같이.*입)/.test(fullInput);
-    const myItems = closetSelected.filter(s => s.type === 'MY');
-    const wishItems = closetSelected.filter(s => s.type === 'WISH');
-
-    if (isOutfitQuery && closetSelected.length >= 2) {
-      // Generate virtual outfit combinations
-      await new Promise(r => setTimeout(r, 1800));
-      const combos = [];
-      const wishTargets = wishItems.length > 0 ? wishItems : closetSelected.slice(0, 1);
-      const myTargets = myItems.length > 0 ? myItems : closetSelected.slice(1);
-      
-      wishTargets.forEach((w, wi) => {
-        myTargets.forEach((m, mi) => {
-          combos.push({
-            label: `${w.name} + ${m.name}`,
-            image: OUTFIT_IMAGES[(wi * 3 + mi) % OUTFIT_IMAGES.length],
-            desc: ['캐주얼 데일리', '오피스 세미캐주얼', '주말 나들이', '미니멀 시크', '스트릿 무드', '모던 클래식'][(wi * 3 + mi) % 6],
-            score: 85 + Math.floor(Math.random() * 13),
-            items: [w, m]
-          });
-        });
-      });
-
-      const outfitMsg = {
-        role: 'assistant',
-        content: `선택하신 아이템들로 ${combos.length}가지 가상 착장 조합을 만들어 봤어요! 각 코디의 매치 점수와 스타일링 포인트를 확인해 보세요.`,
-        outfits: combos.slice(0, 6)
-      };
-      setClosetMessages([...newMsgs, outfitMsg]);
-    } else if (isOutfitQuery && closetSelected.length >= 1) {
-      await new Promise(r => setTimeout(r, 1200));
-      const item = closetSelected[0];
-      const outfitMsg = {
-        role: 'assistant',
-        content: `${item.name}에 어울리는 코디 조합을 만들어 봤어요!`,
-        outfits: [
-          { label: `${item.name} + 슬림 슬랙스`, image: OUTFIT_IMAGES[0], desc: '오피스 세미캐주얼', score: 92, items: [item] },
-          { label: `${item.name} + 와이드 데님`, image: OUTFIT_IMAGES[1], desc: '캐주얼 데일리', score: 88, items: [item] },
-          { label: `${item.name} + 미디 스커트`, image: OUTFIT_IMAGES[2], desc: '페미닌 믹스', score: 85, items: [item] },
-        ]
-      };
-      setClosetMessages([...newMsgs, outfitMsg]);
-    } else {
-      // Detect special queries: 소재/세탁/비슷한 상품
-      const q = fullInput.toLowerCase();
-      const isAnalysisQuery = /(소재|재질|원단|세탁|관리|빨래|다림질|비슷|추천|대안|유사)/.test(q);
-      const selectedItem = closetSelected.length > 0 ? closetSelected[0] : null;
-
-      if (isAnalysisQuery && selectedItem) {
-        const queryType = (q.includes('세탁') || q.includes('관리') || q.includes('빨래') || q.includes('다림질')) ? 'care'
-          : (q.includes('비슷') || q.includes('추천') || q.includes('대안') || q.includes('유사')) ? 'similar' : 'material';
-        
-        try {
-          const res = await fetch('/api/analyze-item', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ imageUrl: selectedItem.image, name: selectedItem.name, brand: selectedItem.brand, queryType })
-          });
-          const data = await res.json();
-          setClosetMessages([...newMsgs, { role: 'assistant', content: data.analysis, analysisItem: { name: selectedItem.name, brand: selectedItem.brand, image: selectedItem.image, type: queryType } }]);
-        } catch {
-          // Fallback
-          const fallbacks = {
-            material: `${selectedItem.name}의 이미지를 분석했어요. 소재는 고품질 혼방 소재로 보여요. 면/폴리에스터 블렌드로 추정되며, 부드러운 촉감과 적당한 두께감이 특징이에요. 통기성과 내구성의 균형이 좋아 다양한 시즌에 활용할 수 있습니다.`,
-            care: `${selectedItem.name}의 이미지를 분석했어요. 세탁망에 넣어 30도 이하 물로 세탁하는 것을 권장해요. 첫 세탁 시 단독 세탁이 안전하며, 건조기보다는 자연 건조를 추천합니다. 다림질은 중저온에서 해주시면 깔끔하게 관리할 수 있어요.`,
-            similar: `${selectedItem.name}과(와) 비슷한 스타일을 찾으시려면, 같은 카테고리의 다른 브랜드 제품을 추천드려요. 톤온톤 매치나 레이어링으로 새로운 코디를 시도해 보시는 것도 좋아요!`,
-          };
-          setClosetMessages([...newMsgs, { role: 'assistant', content: fallbacks[queryType], analysisItem: { name: selectedItem.name, brand: selectedItem.brand, image: selectedItem.image, type: queryType } }]);
-        }
-      } else if (isAnalysisQuery && !selectedItem) {
-        setClosetMessages([...newMsgs, { role: 'assistant', content: '아이템을 선택한 후 다시 질문해 주세요! 마이 아이템이나 위시리스트에서 분석하고 싶은 상품을 클릭하면 됩니다.' }]);
-      } else {
-        // General chat
-        try {
-          const res = await fetch('/api/ai-search', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ input: fullInput })
-          });
-          const data = await res.json();
-          setClosetMessages([...newMsgs, { role: 'assistant', content: data.message || '추천 결과를 찾았어요!' }]);
-        } catch {
-          const response = closetSelected.length > 0
-            ? `${closetSelected[0].name}과(와) 잘 어울리는 아이템들을 찾아봤어요! 선택하신 아이템의 색감과 스타일을 고려했을 때, 미니멀한 톤온톤 코디나 포인트 컬러 매치를 추천드려요.`
-            : '원하시는 스타일을 더 자세히 알려주시면, 딱 맞는 코디를 제안해 드릴게요! 마이 아이템이나 위시리스트을 선택해 보세요.';
-          setClosetMessages([...newMsgs, { role: 'assistant', content: response }]);
-        }
-      }
-    }
-    setIsClosetSearching(false);
-  };
-
-  useEffect(() => { closetChatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [closetMessages]);
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [exploreMessages, isSearching, exploreFilteredProducts, searchShowMoreProducts]);
 
@@ -2270,212 +2104,69 @@ function App() {
     );
   };
 
-  // ── FEED (AI 옷장) ──
+  // ── FEED (옷장: 찜한 상품만) ──
   const renderFeed = () => {
-    const currentItems = closetTab === 'MY' ? MY_CLOTHES : wishClothes;
-    return h('div', { className: 'pb-6 lg:pb-24 animate-fadeIn' },
-      h('div', { className: 'flex flex-col lg:flex-row gap-6 lg:gap-8 lg:items-start', style: { minHeight: 'min(100vh - 120px, 900px)' } },
-        h('div', { className: 'w-full lg:w-[min(100%,340px)] flex-shrink-0 flex flex-col lg:sticky lg:top-24 lg:self-start h-[min(42vh,400px)] lg:h-[calc(100vh-140px)]' },
-          h('div', { className: 'mb-3 flex items-center justify-between' },
-            h('h2', { className: 'text-lg font-semibold text-[#111] tracking-tight' }, '대화'),
-            h('div', { className: 'text-[10px] text-[#aaa] font-medium' }, 'AI 옷장')
+    return h('div', { className: 'pb-6 lg:pb-24 animate-fadeIn max-w-6xl mx-auto px-2 sm:px-3' },
+      h('div', { className: 'mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3' },
+        h('div', null,
+          h('h1', { className: 'text-xl md:text-2xl font-semibold text-[#111] tracking-tight flex items-center gap-2' },
+            h(Heart, { size: 22, className: 'text-slate-800', strokeWidth: 1.5 }),
+            '옷장'
           ),
-          h('div', { className: 'flex-1 bg-white rounded-2xl border border-[#ebebeb] flex flex-col overflow-hidden shadow-card' },
-            // Messages area
-            h('div', { className: 'flex-1 overflow-y-auto p-5 space-y-4 no-scrollbar' },
-              ...closetMessages.map((msg, idx) =>
-                h('div', { key: idx, className: `flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn` },
-                  msg.role === 'user'
-                    ? h('div', { className: 'bg-[#f0f0f0] text-[#111] px-4 py-3 rounded-2xl rounded-tr-sm text-[13px] leading-relaxed font-medium max-w-[85%] border border-[#ebebeb]' }, msg.content)
-                    : h('div', { className: 'flex gap-2.5 max-w-[95%]' },
-                        h('div', { className: 'w-7 h-7 rounded-full bg-[#f5f5f5] border border-[#ebebeb] flex items-center justify-center flex-shrink-0 mt-1' }, h(Sparkles, { size: 12, className: 'text-[#111]', strokeWidth: 1.5 })),
-                        h('div', { className: 'flex-1 min-w-0' },
-                          // Analysis item card (소재/세탁 분석 시)
-                          msg.analysisItem ? h('div', { className: 'flex items-center gap-2.5 bg-[#fafafa] rounded-xl p-2 mb-2 border border-[#ebebeb]' },
-                            h('img', { src: msg.analysisItem.image, className: 'w-10 h-10 rounded-lg object-cover flex-shrink-0', referrerPolicy: 'no-referrer' }),
-                            h('div', { className: 'flex-1 min-w-0' },
-                              h('p', { className: 'text-[9px] text-slate-400 font-bold uppercase' }, msg.analysisItem.brand),
-                              h('p', { className: 'text-[10px] font-medium text-slate-700 truncate' }, msg.analysisItem.name)
-                            ),
-                            h('span', { className: `text-[8px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${msg.analysisItem.type === 'care' ? 'bg-[#f0f0f0] text-[#333] border border-[#ebebeb]' : msg.analysisItem.type === 'similar' ? 'bg-[#111] text-white' : 'bg-[#faf6f0] text-[#8a6d3b] border border-[#ebe4d6]'}` },
-                              msg.analysisItem.type === 'care' ? '🧺 세탁 분석' : msg.analysisItem.type === 'similar' ? '✨ 스타일 분석' : '🔍 소재 분석'
-                            )
-                          ) : null,
-                          h('p', { className: 'text-[13px] text-[#333] leading-relaxed font-normal pt-1' }, msg.content),
-                          // Outfit images grid
-                          msg.outfits ? h('div', { className: 'mt-3 space-y-2' },
-                            ...msg.outfits.map((outfit, oi) =>
-                              h('div', { key: oi, className: 'bg-white rounded-xl border border-[#ebebeb] overflow-hidden shadow-card hover:shadow-soft transition-all cursor-pointer group' },
-                                h('div', { className: 'flex gap-0' },
-                                  // 착장 이미지
-                                  h('div', { className: 'w-20 h-20 flex-shrink-0 relative overflow-hidden' },
-                                    h('img', { src: outfit.image, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', referrerPolicy: 'no-referrer' }),
-                                    h('div', { className: 'absolute top-1 left-1 bg-[#111] text-white text-[7px] font-semibold px-1.5 py-0.5 rounded' }, outfit.score + '점')
-                                  ),
-                                  // 조합 정보
-                                  h('div', { className: 'flex-1 p-2 min-w-0' },
-                                    h('p', { className: 'text-[10px] font-black text-slate-800 truncate leading-tight' }, outfit.label),
-                                    h('p', { className: 'text-[9px] text-[#888] font-medium mt-0.5' }, outfit.desc),
-                                    // 조합 아이템 미니 썸네일
-                                    outfit.items ? h('div', { className: 'flex gap-1 mt-1.5' },
-                                      ...outfit.items.map((it, ii) =>
-                                        h('div', { key: ii, className: 'flex items-center gap-1 bg-slate-50 rounded-md px-1 py-0.5' },
-                                          h('img', { src: it.image, className: 'w-4 h-4 rounded object-cover', referrerPolicy: 'no-referrer' }),
-                                          h('span', { className: 'text-[7px] text-slate-500 font-bold truncate max-w-[50px]' }, it.name)
-                                        )
-                                      )
-                                    ) : null
-                                  )
-                                )
-                              )
-                            )
-                          ) : null
-                        )
-                      )
-                )
-              ),
-              isClosetSearching ? h('div', { className: 'flex gap-2.5' },
-                h('div', { className: 'w-7 h-7 rounded-full bg-[#f5f5f5] border border-[#ebebeb] flex items-center justify-center flex-shrink-0' }, h(Loader2, { size: 12, className: 'animate-spin text-[#111]' })),
-                h('span', { className: 'text-[11px] text-slate-400 font-bold pt-2' }, 'AI 분석 중...')
-              ) : null,
-              h('div', { ref: closetChatEndRef })
-            ),
-            // Quick chips — context-aware
-            h('div', { className: 'px-3 py-2 flex gap-1.5 flex-wrap border-t border-[#f0f0f0]' },
-              ...(closetSelected.some(s => s.type === 'MY')
-                ? ['비슷한 상품 추천', '소재 정보', '세탁 방법']
-                : closetSelected.some(s => s.type === 'WISH')
-                  ? ['이 조합 코디 보여줘', '더 저렴한 것 보여줘', '비슷한 스타일 더']
-                  : ['이 조합 코디 보여줘', '더 저렴한 것 보여줘', '비슷한 스타일 더']
-              ).map(chip =>
-                h('button', { key: chip, onClick: () => handleClosetChat(chip), className: 'px-2.5 py-1 bg-[#fafafa] rounded-md text-[11px] font-medium text-[#666] hover:bg-[#f0f0f0] hover:text-[#111] transition-colors border border-[#ebebeb]' }, chip)
-              )
-            ),
-            // Selected items — pinned above input
-            closetSelected.length > 0 ? h('div', { className: 'px-4 py-2 space-y-1.5' },
-              ...closetSelected.map(s =>
-                h('div', { key: s.key, className: 'flex items-center gap-2 bg-[#fafafa] rounded-xl px-3 py-2 border border-[#ebebeb]' },
-                  h('img', { src: s.image, className: 'w-8 h-8 rounded-lg object-cover flex-shrink-0' }),
-                  h('span', { className: 'text-[11px] font-bold text-slate-700 truncate flex-1' }, s.name),
-                  h('button', { onClick: (e) => { e.stopPropagation(); toggleClosetItem(s, s.type); }, className: 'text-slate-400 hover:text-red-500 flex-shrink-0' }, h(X, { size: 12 }))
-                )
-              )
-            ) : null,
-            // Input area
-            h('div', { className: 'p-3 border-t border-[#ebebeb]' },
-              h('div', { className: 'bg-[#fafafa] rounded-xl p-1.5 flex items-center gap-2 border border-[#ebebeb]' },
-                h('input', { type: 'text', placeholder: '첨부한 상품 기준으로 요청을 입력하세요...', className: 'flex-1 bg-transparent outline-none text-[13px] font-normal text-[#111] placeholder-[#aaa] py-2 px-3', value: closetChatInput, onChange: e => setClosetChatInput(e.target.value), onKeyDown: e => e.key === 'Enter' && handleClosetChat(closetChatInput) }),
-                h('button', { onClick: () => handleClosetChat(closetChatInput), disabled: isClosetSearching || (!closetChatInput.trim() && closetSelected.length === 0), className: 'w-9 h-9 bg-[#111] text-white rounded-lg flex items-center justify-center hover:bg-[#333] transition-all disabled:opacity-30' }, h(ArrowUp, { size: 16, strokeWidth: 1.5 }))
-              )
-            )
-          )
+          h('p', { className: 'text-[#888] text-sm mt-1 font-normal' }, '하트로 찜한 상품만 모아 보여요')
         ),
-        // Right: Split view — 마이 아이템 | 위시리스트
-        h('div', { className: 'flex-1 min-w-0 flex flex-col md:flex-row gap-8 md:gap-4' },
-          // 마이 아이템
-          h('div', { className: 'flex-1 min-w-0' },
-            h('h3', { className: 'text-[13px] font-semibold text-[#111] mb-3' }, '마이 아이템 ', h('span', { className: 'text-[#888] font-normal' }, MY_CLOTHES.length)),
-            h('div', { className: 'grid grid-cols-2 gap-3' },
-              ...MY_CLOTHES.map(item => {
-                const isSelected = closetSelected.some(s => s.key === 'MY:' + item.id);
-                const isCoordiOpen = expandedCoordi === item.id;
-                const coordiItems = COORDI_RECS[item.id] || [];
-                const discount = item.originalPrice ? Math.round((1 - item.price / item.originalPrice) * 100) : 0;
-                return h('div', { key: item.id, className: 'group transition-all' },
-                  h('div', { className: `cursor-pointer rounded-xl transition-all ${isSelected ? 'ring-2 ring-[#111] ring-offset-2' : ''}`, onClick: () => toggleClosetItem(item, 'MY') },
-                    h('div', { className: 'relative overflow-hidden rounded-xl bg-[#f5f5f5] aspect-square mb-1.5' },
-                      h('img', { src: item.image, className: 'w-full h-full object-cover transition-transform duration-500 group-hover:scale-105', referrerPolicy: 'no-referrer' }),
-                      isSelected ? h('div', { className: 'absolute top-2 left-2 w-6 h-6 bg-[#111] rounded-full flex items-center justify-center shadow-lg' },
-                        h(CheckCircle2, { size: 12, className: 'text-white' })
-                      ) : null
-                    ),
-                    h('div', null,
-                      h('p', { className: 'text-[9px] font-bold text-slate-400 uppercase tracking-wider' }, item.brand),
-                      h('p', { className: 'text-[11px] font-medium text-slate-800 truncate' }, item.name),
-                      h('div', { className: 'flex items-baseline gap-1.5 mt-0.5' },
-                        item.originalPrice ? h('span', { className: 'text-[9px] text-slate-300 line-through' }, fmt(item.originalPrice)) : null,
-                        discount > 0 ? h('span', { className: 'text-[10px] font-black text-red-500' }, discount + '%') : null,
-                        h('span', { className: 'text-[11px] font-black text-slate-900' }, fmt(item.price))
-                      )
-                    )
-                  ),
-                  // AI 추천 코디 button
-                  h('button', { onClick: (e) => { e.stopPropagation(); setExpandedCoordi(isCoordiOpen ? null : item.id); }, className: `mt-1 w-full flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10px] font-semibold transition-all ${isCoordiOpen ? 'bg-[#f5f5f5] text-[#111] border border-[#ebebeb]' : 'bg-[#fafafa] text-[#666] border border-[#ebebeb] hover:bg-[#f0f0f0] hover:text-[#111]'}` },
-                    h(Sparkles, { size: 10, strokeWidth: 1.5 }), 'AI 추천 코디템'
-                  ),
-                  // Expanded coordi recommendations
-                  isCoordiOpen && coordiItems.length > 0 ? h('div', { className: 'mt-2 bg-[#fafafa] rounded-lg p-2 border border-[#ebebeb] animate-fadeIn' },
-                    h('div', { className: 'flex gap-2 overflow-x-auto no-scrollbar pb-1' },
-                      ...coordiItems.map((rec, ri) =>
-                        h('div', { key: ri, className: 'flex-shrink-0 w-28 cursor-pointer group', onClick: () => { setSelectedProduct({ ...rec, originalPrice: Math.round(rec.price * 1.3), stock: 5, tag: 'AI 추천', colors: [{ name: '기본', hex: '#888', image: rec.image }] }); setDetailColorIdx(0); setDetailTab("REVIEW"); setIsDetailOpen(true); } },
-                          h('div', { className: 'relative rounded-lg overflow-hidden bg-white aspect-square mb-1' },
-                            h('img', { src: rec.image, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300', referrerPolicy: 'no-referrer' }),
-                            h('div', { className: 'absolute bottom-1 left-1 bg-[#111] text-white text-[7px] font-semibold px-1.5 py-0.5 rounded' }, 'AI로 바로입기'),
-                            h('button', { onClick: (e) => { e.stopPropagation(); addToWishlist({ ...rec, originalPrice: Math.round(rec.price * 1.3), stock: 5, colors: [{ name: '기본', hex: '#888', image: rec.image }] }); }, className: 'absolute top-1 right-1 bg-white/80 backdrop-blur-sm rounded-full w-5 h-5 flex items-center justify-center text-slate-400 hover:text-red-500 transition-all shadow-sm' },
-                              h(Heart, { size: 10 })
-                            )
-                          ),
-                          h('p', { className: 'text-[8px] text-slate-400 font-bold uppercase truncate' }, rec.brand),
-                          h('p', { className: 'text-[9px] font-medium text-slate-700 truncate' }, rec.name),
-                          h('p', { className: 'text-[9px] font-black text-slate-900' }, fmt(rec.price))
-                        )
-                      )
-                    )
-                  ) : null
-                );
-              }),
-              h('div', { className: 'group cursor-pointer' },
-                h('div', { className: 'rounded-xl bg-[#fafafa] border-2 border-dashed border-[#ebebeb] aspect-square flex flex-col items-center justify-center gap-1 hover:border-[#ccc] hover:bg-[#f5f5f5] transition-all' },
-                  h('span', { className: 'text-lg text-[#ccc] group-hover:text-[#111]' }, '+'),
-                  h('span', { className: 'text-[9px] font-semibold text-[#bbb] group-hover:text-[#333]' }, '추가')
-                )
-              )
-            )
-          ),
-          // 위시리스트
-          h('div', { className: 'flex-1 min-w-0' },
-            h('h3', { className: 'text-[13px] font-semibold text-[#111] mb-3' }, '위시리스트 ', h('span', { className: 'text-[#888] font-normal' }, wishClothes.length)),
-            h('div', { className: 'grid grid-cols-2 gap-3' },
-              ...wishClothes.map(item => {
-                const isSelected = closetSelected.some(s => s.key === 'WISH:' + item.id);
-                const discount = item.originalPrice ? Math.round((1 - item.price / item.originalPrice) * 100) : 0;
-                return h('div', { key: item.id, className: `group cursor-pointer transition-all ${isSelected ? 'ring-2 ring-[#111] ring-offset-2 rounded-xl' : ''}` },
-                  h('div', { className: 'relative overflow-hidden rounded-xl bg-[#f5f5f5] aspect-square mb-1.5', onClick: (e) => { e.stopPropagation(); setSelectedProduct(item); setDetailColorIdx(0); setDetailTab("REVIEW"); setIsDetailOpen(true); } },
-                    h('img', { src: item.image, className: 'w-full h-full object-cover transition-transform duration-500 group-hover:scale-105', referrerPolicy: 'no-referrer' }),
-                    // Select checkbox
-                    h('div', { className: 'absolute top-2 left-2 z-10', onClick: (e) => { e.stopPropagation(); toggleClosetItem(item, 'WISH'); } },
-                      isSelected ? h('div', { className: 'w-6 h-6 bg-[#111] rounded-full flex items-center justify-center shadow-lg' },
-                        h(CheckCircle2, { size: 12, className: 'text-white' })
-                      ) : h('div', { className: 'w-6 h-6 bg-white/60 backdrop-blur rounded-full border border-white/80 opacity-0 group-hover:opacity-100 transition-all' })
-                    ),
-                    // Sales tag
-                    item.tag ? h('div', { className: `absolute top-2 right-2 px-1.5 py-0.5 rounded text-[8px] font-semibold shadow-sm ${item.tag === '최저가' ? 'bg-[#c00] text-white' : item.tag.includes('클릭') ? 'bg-[#b45309] text-white' : item.tag.includes('할인') ? 'bg-[#be123c] text-white' : 'bg-[#111] text-white'}` }, item.tag) : null
-                  ),
-                  h('div', null,
-                    h('p', { className: 'text-[9px] font-bold text-slate-400 uppercase tracking-wider' }, item.brand),
-                    h('p', { className: 'text-[11px] font-medium text-slate-800 truncate' }, item.name),
-                    item.price ? h('div', { className: 'flex items-baseline gap-1.5 mt-0.5' },
-                      item.originalPrice ? h('span', { className: 'text-[9px] text-slate-300 line-through' }, fmt(item.originalPrice)) : null,
-                      discount > 0 ? h('span', { className: 'text-[10px] font-black text-red-500' }, discount + '%') : null,
-                      h('span', { className: 'text-[11px] font-black text-slate-900' }, fmt(item.price))
-                    ) : null,
-                    // Track Price button
-                    h('button', { onClick: (e) => { e.stopPropagation(); setSelectedProduct(item); setIsModalOpen(true); }, className: 'mt-1.5 w-full flex items-center justify-center gap-1 py-1.5 rounded-lg border border-[#ebebeb] text-[10px] font-medium text-[#666] hover:border-[#ccc] hover:text-[#111] transition-all' },
-                      h(TrendingDown, { size: 10 }), 'Track Price'
-                    )
-                  )
-                );
-              }),
-              h('div', { className: 'group cursor-pointer' },
-                h('div', { className: 'rounded-xl bg-[#fafafa] border-2 border-dashed border-[#ebebeb] aspect-square flex flex-col items-center justify-center gap-1 hover:border-[#ccc] hover:bg-[#f5f5f5] transition-all' },
-                  h('span', { className: 'text-lg text-[#ccc] group-hover:text-[#111]' }, '+'),
-                  h('span', { className: 'text-[9px] font-semibold text-[#bbb] group-hover:text-[#333]' }, '추가')
-                )
-              )
-            )
+        h('button', {
+          type: 'button',
+          onClick: () => setView('SEARCH'),
+          className: 'shrink-0 px-4 py-2 rounded-xl text-[13px] font-medium text-[#333] bg-white border border-[#ebebeb] hover:bg-[#fafafa] transition-colors shadow-sm',
+        }, '쇼핑 계속하기')
+      ),
+      wishClothes.length === 0
+        ? h('div', { className: 'text-center py-20 sm:py-24 bg-white rounded-2xl border border-[#ebebeb] shadow-card' },
+            h(Heart, { size: 52, className: 'mx-auto mb-4 text-[#e5e5e5]', strokeWidth: 1.25 }),
+            h('h2', { className: 'text-base font-semibold text-[#111] mb-2' }, '찜한 상품이 없어요'),
+            h('p', { className: 'text-[#888] text-sm mb-6 max-w-sm mx-auto' }, '마음에 드는 상품에 하트를 누르면 여기에 쌓여요'),
+            h('button', {
+              type: 'button',
+              onClick: () => setView('HOME'),
+              className: 'px-6 py-3 rounded-xl bg-[#111] text-white text-[13px] font-medium hover:bg-[#333] transition-colors',
+            }, '홈에서 둘러보기')
           )
-        )
-      )
+        : h('div', { className: 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4' },
+            ...wishClothes.map((item) => {
+              const discount = item.originalPrice ? Math.round((1 - item.price / item.originalPrice) * 100) : 0;
+              return h('div', {
+                key: item.id,
+                className: 'group bg-white rounded-xl border border-[#ebebeb] overflow-hidden shadow-card hover:shadow-soft transition-shadow',
+              },
+                h('div', {
+                  className: 'relative aspect-[3/4] bg-slate-100 cursor-pointer overflow-hidden',
+                  onClick: () => { setSelectedProduct(item); setDetailColorIdx(0); setDetailTab('REVIEW'); setIsDetailOpen(true); },
+                },
+                  h('img', { src: item.image, className: 'w-full h-full object-cover transition-transform duration-500 group-hover:scale-105', referrerPolicy: 'no-referrer' }),
+                  item.tag ? h('div', { className: 'absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-semibold bg-[#111] text-white shadow-sm' }, item.tag) : null,
+                  discount > 0 ? h('div', { className: 'absolute bottom-2 left-2 px-2 py-0.5 rounded text-[9px] font-black bg-red-500 text-white' }, `${discount}%`) : null,
+                  h('button', {
+                    type: 'button',
+                    className: 'absolute top-2 right-2 w-9 h-9 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-red-500 hover:text-red-600 shadow-sm z-10',
+                    onClick: (e) => { e.stopPropagation(); setWishClothes((prev) => prev.filter((w) => w.id !== item.id)); },
+                    'aria-label': '찜 해제',
+                  }, h(Heart, { size: 18, fill: 'currentColor', strokeWidth: 1.5 }))
+                ),
+                h('div', {
+                  className: 'p-3 cursor-pointer',
+                  onClick: () => { setSelectedProduct(item); setDetailColorIdx(0); setDetailTab('REVIEW'); setIsDetailOpen(true); },
+                },
+                  h('p', { className: 'text-[11px] font-bold text-slate-500 uppercase tracking-wide' }, item.brand),
+                  h('p', { className: 'text-sm font-medium text-slate-800 line-clamp-2 min-h-[2.5rem]' }, item.name),
+                  h('div', { className: 'flex items-baseline gap-2 mt-2' },
+                    item.originalPrice ? h('span', { className: 'text-xs text-slate-300 line-through' }, fmt(item.originalPrice)) : null,
+                    h('span', { className: 'text-sm font-black text-slate-900' }, fmt(item.price))
+                  )
+                )
+              );
+            })
+          )
     );
   };
 
@@ -3919,7 +3610,7 @@ function App() {
       h('div', { className: 'bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3' },
         h(Heart, { size: 16, className: 'text-red-400', fill: 'currentColor' }),
         h('span', { className: 'text-sm font-bold' }, wishToast),
-        h('span', { className: 'text-sm text-slate-400' }, 'AI 옷장에 추가됨')
+        h('span', { className: 'text-sm text-slate-400' }, '옷장에 담았어요')
       )
     ) : null
   );
