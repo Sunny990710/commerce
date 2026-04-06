@@ -5,9 +5,10 @@ FastAPI server with Gemini AI integration
 
 import os, json
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 from fastapi import FastAPI, Body, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 BASE_DIR = Path(__file__).resolve().parent
@@ -15,7 +16,7 @@ ASSETS_DIR = (BASE_DIR / "assets").resolve()
 
 
 def _asset_search_roots():
-    """server.py 위치·작업 디렉터리가 달라도 assets 폴더를 찾기 위한 후보."""
+    """로그용: assets 폴더 후보."""
     roots = []
     for r in (ASSETS_DIR, Path.cwd() / "assets", BASE_DIR / "assets"):
         try:
@@ -30,22 +31,6 @@ def _asset_search_roots():
             out.append(r)
     return out
 
-
-def _find_asset_file(filename: str) -> Optional[Path]:
-    """pin-01.png 등 파일명만 허용 (하위 경로·.. 차단)."""
-    if not filename or filename != Path(filename).name or ".." in filename:
-        return None
-    for root in _asset_search_roots():
-        if not root.is_dir():
-            continue
-        full = (root / filename).resolve()
-        try:
-            full.relative_to(root)
-        except ValueError:
-            continue
-        if full.is_file():
-            return full
-    return None
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
@@ -294,25 +279,40 @@ async def serve_index():
     return FileResponse(str(BASE_DIR / "index.html"))
 
 
+@app.get("/assets/explore/{file_path:path}")
+async def serve_assets_explore(file_path: str):
+    """대화 탭 프레피 룩북 등 — explore/*.png (마운트보다 먼저 매칭)."""
+    if not file_path or ".." in file_path.replace("\\", "/"):
+        raise HTTPException(status_code=404, detail="Not found")
+    root = (ASSETS_DIR / "explore").resolve()
+    if not root.is_dir():
+        raise HTTPException(status_code=404, detail="Not found")
+    full = (root / file_path).resolve()
+    try:
+        full.relative_to(root)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Not found")
+    if not full.is_file():
+        raise HTTPException(status_code=404, detail="Not found")
+    return FileResponse(full)
+
+
 @app.on_event("startup")
 async def _log_asset_roots():
     for r in _asset_search_roots():
         if r.is_dir():
             n_pin = len(list(r.glob("pin-*.png")))
             n_sb = len(list(r.glob("same-brand-*.png")))
-            if n_pin or n_sb:
-                print(f"[commerce] assets: {r} (pin: {n_pin}, same-brand: {n_sb})")
+            n_explore = len(list(r.glob("explore/*.png")))
+            if n_pin or n_sb or n_explore:
+                print(f"[commerce] assets: {r} (pin: {n_pin}, same-brand: {n_sb}, explore: {n_explore})")
                 return
-    print(f"[commerce] WARNING: no pin-*.png in { _asset_search_roots() } — copy PNGs into assets/")
+    print(f"[commerce] WARNING: no assets in { _asset_search_roots() } — copy PNGs into assets/")
 
 
-@app.get("/assets/{filename}")
-async def serve_asset(filename: str):
-    """룩북 핀 이미지 (/assets/pin-01.png). :path 변환 이슈를 피하기 위해 파일명만 받음."""
-    full = _find_asset_file(filename)
-    if full is None:
-        raise HTTPException(status_code=404, detail="Not found")
-    return FileResponse(full, filename=filename)
+# /assets/pin-01.png, /assets/explore/preppy-lookbook.png 등 하위 경로 전부 서빙
+# (기존 /assets/{filename} 단일 세그먼트만 허용 → explore/*.png 가 404였음)
+app.mount("/assets", StaticFiles(directory=str(ASSETS_DIR)), name="assets")
 
 
 if __name__ == "__main__":
