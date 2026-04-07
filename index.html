@@ -195,7 +195,7 @@ const ONBOARDING_BRAND_OPTIONS = [
   { id: 'polo', label: 'POLO' },
   { id: 'nb', label: '뉴발란스' },
   { id: 'zara', label: 'ZARA' },
-  { id: 'muji', label: 'MUJI' },
+  { id: '링서울', label: '링서울' },
 ];
 
 /** 온보딩 1~4단계 공통 진행 바 (스타일 → 브랜드 → 가격대 → 신체정보) */
@@ -221,11 +221,11 @@ function renderOnboardingProgressBar(step1to4) {
 
 /** 온보딩 가격대 선호 */
 const ONBOARDING_PRICE_OPTIONS = [
-  { id: 'value', label: '가성비', desc: '아이템당 3만원 이하', brands: 'SPAO, 탑텐, 유니클로', emoji: '💰' },
-  { id: 'reasonable', label: '합리적', desc: '아이템당 3~8만원', brands: 'DEPOUND, WHO.A.U, KIRSH', emoji: '💳' },
-  { id: 'premium', label: '프리미엄', desc: '아이템당 8~20만원', brands: 'MATIN KIM, COS, ADER ERROR', emoji: '✨' },
-  { id: 'luxury', label: '럭셔리', desc: '아이템당 20만원 이상', brands: 'LEMAIRE, Maison Margiela', emoji: '👑' },
-  { id: 'any', label: '상관없어요', desc: '특정 가격대를 고정하지 않아요', brands: '', emoji: '👀' },
+  { id: 'value', label: '가성비', desc: '아이템당 3만원 이하', brandTags: ['SPAO', '탑텐', '유니클로'], emoji: '💰' },
+  { id: 'reasonable', label: '합리적', desc: '아이템당 3~8만원', brandTags: ['ZARA', '아쎄르', '미치코런던'], emoji: '💳' },
+  { id: 'premium', label: '프리미엄', desc: '아이템당 8~20만원', brandTags: ['MATIN KIM', 'COS', '아르켓'], emoji: '✨' },
+  { id: 'luxury', label: '럭셔리', desc: '아이템당 20만원 이상', brandTags: ['잉크', 'Maison Margiela'], emoji: '👑' },
+  { id: 'any', label: '상관없어요', desc: '특정 가격대를 고정하지 않아요', brandTags: [], emoji: '👀' },
 ];
 
 function renderOnboardingPriceEmoji(emoji) {
@@ -1333,7 +1333,7 @@ function App() {
       return true;
     }
   });
-  /** 온보딩: 0 환영, 1 스타일, 2 브랜드, 3 가격대, 4 나이·키·몸무게, 5 분석 중, 6 결과 */
+  /** 온보딩: 0 환영, 1 스타일, 2 브랜드, 3 가격대, 4 나이·키·몸무게, 5 분석 중, 6 결과, 7 피드 만드는 중 */
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [onboardingStylePick, setOnboardingStylePick] = useState(() => new Set());
   const [onboardingBrandPick, setOnboardingBrandPick] = useState(() => new Set());
@@ -1940,6 +1940,14 @@ function App() {
   useEffect(() => {
     if (!showOnboarding || onboardingStep !== 5) return;
     const t = window.setTimeout(() => setOnboardingStep(6), 5000);
+    return () => window.clearTimeout(t);
+  }, [showOnboarding, onboardingStep]);
+  /** 결과에서 '시작하기' 후 피드 전환(7단계) 4초 뒤 홈(온보딩 종료) */
+  useEffect(() => {
+    if (!showOnboarding || onboardingStep !== 7) return;
+    const t = window.setTimeout(() => {
+      completeOnboarding();
+    }, 4000);
     return () => window.clearTimeout(t);
   }, [showOnboarding, onboardingStep]);
   const toggleOnboardingStyleCell = (idx) => {
@@ -5876,8 +5884,14 @@ function App() {
           b.label.toLowerCase().includes(onbBrandQ) ||
           b.id.toLowerCase().includes(onbBrandQ)
       );
-      const onboardingBrandReady = onboardingBrandPick.size >= 1;
-      const onboardingBrandFooterHint = onboardingBrandPick.size === 0 ? '브랜드를 1개 이상 선택해 주세요' : null;
+      const onboardingBrandCount = onboardingBrandPick.size;
+      const onboardingBrandReady = onboardingBrandCount >= 3;
+      const onboardingBrandFooterHint =
+        onboardingBrandCount === 0
+          ? '브랜드를 3개 이상 선택해주세요'
+          : onboardingBrandCount < 3
+            ? '브랜드를 ' + (3 - onboardingBrandCount) + '개 더 선택해주세요'
+            : null;
       return h(
         'div',
         {
@@ -6093,7 +6107,7 @@ function App() {
         ),
         h(
           'div',
-          { className: 'min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pt-2' },
+          { className: 'min-h-0 flex-1 scroll-auto overflow-y-auto overscroll-contain px-5 pt-2' },
           h(
             'div',
             { className: 'flex flex-col gap-3 pb-4' },
@@ -6107,16 +6121,16 @@ function App() {
                   onClick: () => setOnboardingPriceTier(opt.id),
                   'aria-pressed': sel,
                   className:
-                    'flex w-full gap-3 rounded-2xl border px-4 py-3.5 text-left outline-none transition-all duration-200 ease-out motion-safe:active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[#111]/30 focus-visible:ring-offset-2 ' +
+                    'flex w-full gap-3 rounded-2xl border-2 px-4 py-3.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-[#111]/30 focus-visible:ring-offset-2 ' +
                     (sel
-                      ? 'border-2 border-[#111] bg-[#fafafa] shadow-[0_1px_4px_rgba(0,0,0,0.06)]'
-                      : 'border border-[#e5e7eb] bg-white hover:border-[#d1d5db] hover:bg-[#fafafa]'),
+                      ? 'border-[#111] bg-[#fafafa] shadow-[0_1px_4px_rgba(0,0,0,0.06)]'
+                      : 'border-[#e5e7eb] bg-white hover:border-[#d1d5db] hover:bg-[#fafafa]'),
                 },
                 h(
                   'div',
                   {
                     className:
-                      'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors duration-200 ' +
+                      'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ' +
                       (sel ? 'bg-[#ebebeb]' : 'bg-[#f3f4f6]'),
                   },
                   renderOnboardingPriceEmoji(opt.emoji)
@@ -6132,8 +6146,22 @@ function App() {
                     opt.label
                   ),
                   h('div', { className: 'mt-0.5 text-[13px] text-[#6b7280]' }, opt.desc),
-                  opt.brands
-                    ? h('div', { className: 'mt-1 text-[11px] italic text-[#9ca3af]' }, opt.brands)
+                  opt.brandTags && opt.brandTags.length
+                    ? h(
+                        'div',
+                        { className: 'mt-2 flex flex-wrap gap-1.5' },
+                        ...opt.brandTags.map((name, bi) =>
+                          h(
+                            'span',
+                            {
+                              key: 'onb-price-brand-' + opt.id + '-' + bi,
+                              className:
+                                'inline-flex max-w-full shrink-0 rounded-md border border-[#e8e8e8] bg-[#f4f4f5] px-2 py-0.5 text-[11px] font-medium leading-tight text-[#6b7280]',
+                            },
+                            name
+                          )
+                        )
+                      )
                     : null
                 )
               );
@@ -6498,13 +6526,35 @@ function App() {
               'button',
               {
                 type: 'button',
-                onClick: completeOnboarding,
+                onClick: () => setOnboardingStep(7),
                 className:
                   'min-h-[52px] flex-1 rounded-2xl bg-[#111] py-3.5 text-[15px] font-bold text-white transition-colors hover:bg-[#333] active:scale-[0.99]',
               },
               '시작하기'
             )
           )
+        )
+      );
+    }
+
+    if (onboardingStep === 7) {
+      return h(
+        'div',
+        {
+          className:
+            'fixed inset-0 z-[600] flex min-h-[100dvh] min-w-0 flex-col items-center justify-center bg-white px-8 font-sans text-[#111]',
+          role: 'dialog',
+          'aria-modal': 'true',
+          'aria-labelledby': 'onboarding-feed-transition-title',
+          'aria-busy': 'true',
+        },
+        h(
+          'p',
+          {
+            id: 'onboarding-feed-transition-title',
+            className: 'max-w-[min(100%,340px)] text-center text-[17px] font-semibold leading-relaxed text-[#111]',
+          },
+          '내가 좋아하는 스타일의 피드를 만드는 중...'
         )
       );
     }
