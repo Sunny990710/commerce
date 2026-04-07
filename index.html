@@ -495,7 +495,7 @@ const SAME_BRAND_GRID_IMAGES = [
   'same-brand-06.png',
 ];
 
-/** 홈 추천 무드: 1~3은 assets/mood/mood-0n.png, 제목은 코드에서 한 겹만 렌더 */
+/** 홈 추천 무드: mood-01.png ~ mood-04.jpg, 제목은 코드에서 한 겹만 렌더 */
 const HOME_MOOD_BANNERS = [
   {
     id: 'm1',
@@ -519,7 +519,7 @@ const HOME_MOOD_BANNERS = [
   {
     id: 'm4',
     title: '하객룩 코디',
-    bgImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80',
+    bgImage: moodAssetSrc('mood-04.jpg'),
     feedProductIds: ['9', '5', '8', '3', '7', '4'],
   },
 ];
@@ -962,6 +962,29 @@ const getExploreTierProducts = (product) => {
   }
   return { similarList, boughtTogether, sameBrandList };
 };
+
+/** 탐색 패널 「비슷한 무드의 브랜드 추천」— 한글 라벨 + MOCK_PRODUCTS.brand 매칭 */
+const EXPLORE_MOOD_BRAND_CHIPS_PRESET = [
+  { brand: 'MIXXO', labelKo: '마른파이브', logoText: 'm', logoClass: 'text-[11px] font-serif italic' },
+  { brand: 'Gap', labelKo: '갭', logoText: 'Gap', logoClass: 'text-[7px] font-bold leading-tight text-center' },
+  { brand: 'SPAO', labelKo: '스파오', logoText: 'S', logoClass: 'text-[11px] font-bold' },
+  { brand: 'MUSINSA', labelKo: '무신사', logoText: 'M', logoClass: 'text-[11px] font-bold' },
+];
+function getExploreMoodBrandChips(anchorProduct) {
+  if (!anchorProduct) return [];
+  const ab = anchorProduct.brand;
+  const pool = EXPLORE_MOOD_BRAND_CHIPS_PRESET.filter((c) => c.brand !== ab);
+  const out = [...pool];
+  const seen = new Set(out.map((c) => c.brand));
+  const rest = [...new Set(MOCK_PRODUCTS.map((p) => p.brand))].filter((b) => b !== ab && !seen.has(b));
+  for (const b of rest) {
+    if (out.length >= 4) break;
+    const short = b.replace(/\s+/g, '').length <= 3 ? b.replace(/\s+/g, '') : b.slice(0, 2);
+    out.push({ brand: b, labelKo: b, logoText: short, logoClass: 'text-[9px] font-bold' });
+    seen.add(b);
+  }
+  return out.slice(0, 4);
+}
 
 /** 분할 화면 우측 피드: 검색창 하단 태그 칩 (카테고리·상품 태그 기반) */
 const EXPLORE_RELATED_TAGS_BY_CATEGORY = {
@@ -1424,6 +1447,8 @@ function App() {
   const [homeExploreTab, setHomeExploreTab] = useState('REVIEW');
   /** 홈 분할 패널 상단 검색 */
   const [homeExploreQuery, setHomeExploreQuery] = useState('');
+  /** 홈 분할 우측 「비슷한 무드의 브랜드 추천」선택 브랜드(MOCK_PRODUCTS.brand 문자열) */
+  const [homeExploreMoodBrand, setHomeExploreMoodBrand] = useState(null);
   /** 홈 메인 피드 상단 검색 (오버레이와 별도, 닫을 때 유지) */
   const [homeFeedSearchQuery, setHomeFeedSearchQuery] = useState('');
   const [closetFeedSearchQuery, setClosetFeedSearchQuery] = useState('');
@@ -1809,6 +1834,15 @@ function App() {
       setHomeExploreTab('REVIEW');
       setHomeExploreQuery('');
     }
+  }, [homeExplore?.product?.id]);
+
+  useEffect(() => {
+    if (!homeExplore?.product) {
+      setHomeExploreMoodBrand(null);
+      return;
+    }
+    const chips = getExploreMoodBrandChips(homeExplore.product);
+    setHomeExploreMoodBrand(chips[0]?.brand ?? null);
   }, [homeExplore?.product?.id]);
 
   useEffect(() => {
@@ -2462,9 +2496,11 @@ function App() {
     const renderCard = (sp, i) => {
       const isW = wishClothes.some((w) => w.id === sp.id || w.id === 'w_' + sp.id);
       const imgSrc =
-        keyPrefix === 'br'
-          ? homePinSrc(SAME_BRAND_GRID_IMAGES[i % SAME_BRAND_GRID_IMAGES.length])
-          : productDisplayImage(sp);
+        typeof opts.getCardImage === 'function'
+          ? opts.getCardImage(sp, i)
+          : keyPrefix === 'br'
+            ? homePinSrc(SAME_BRAND_GRID_IMAGES[i % SAME_BRAND_GRID_IMAGES.length])
+            : productDisplayImage(sp);
       const aspect = row ? 'aspect-[3/4]' : uniformGrid ? uniformAspect : HOME_FEED_ASPECT_CLASSES[i % HOME_FEED_ASPECT_CLASSES.length];
       const discount =
         sp.originalPrice && sp.originalPrice > sp.price
@@ -6192,6 +6228,15 @@ function App() {
         )
       : [];
     const exploreTiers = !q ? getExploreTierProducts(product) : null;
+    /** 무드 에셋 썸네일 + 실제 상품 메타(가격·쿠폰 등) — 비슷한 상품과 동일 카드 레이아웃 */
+    const exploreRecommendedPicks = !q
+      ? HOME_MOOD_BANNERS.map((b, i) => {
+          const pid = b.feedProductIds[0];
+          const found = MOCK_PRODUCTS.find((x) => String(x.id) === String(pid));
+          const base = found || MOCK_PRODUCTS[i % MOCK_PRODUCTS.length];
+          return { ...base, _exploreMoodHero: b.bgImage };
+        })
+      : [];
     const exploreRelTags = getExploreRelatedTags(product);
     const closeExplore = () => {
       setHomeExploreQuery('');
@@ -6501,31 +6546,33 @@ function App() {
           h('h2', {
             className: 'text-[17px] font-bold text-[#111] tracking-tight',
           }, q ? ('“' + homeExploreQuery.trim() + '” 검색 결과') : '당신을 위한 추천'),
-          !q && h('div', { className: 'grid grid-cols-4 gap-1.5 sm:gap-2.5 mt-3 mb-4' },
-            ...HOME_MOOD_BANNERS.map((b) =>
-              h('button', {
-                key: b.id,
-                type: 'button',
-                onClick: () => goHomeFromMoodBanner(b.title),
-                className: 'relative min-w-0 h-[64px] sm:h-[80px] rounded-xl overflow-hidden shadow-sm border border-[#ebebeb] bg-[#e8e8e8] text-left cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111] focus-visible:ring-offset-2',
-                'aria-label': b.title + ' 테마로 홈에서 보기',
-              },
-                h('img', {
-                  src: b.bgImage,
-                  alt: '',
-                  className: 'absolute inset-0 w-full h-full object-cover',
-                  referrerPolicy: 'no-referrer'
-                }),
-                h('div', { className: 'absolute inset-0 bg-black/38 pointer-events-none' }),
-                h('div', { className: 'absolute inset-0 flex items-center justify-center px-2 pointer-events-none' },
-                  h('span', {
-                    className: 'text-[12px] sm:text-[13px] font-bold text-center text-white leading-tight line-clamp-2',
-                    style: { textShadow: '0 1px 3px rgba(0,0,0,0.85)' }
-                  }, b.title)
+          !q &&
+            h('div', { className: 'grid grid-cols-4 gap-1.5 sm:gap-2.5 mt-3 mb-4' },
+              ...HOME_MOOD_BANNERS.map((b) =>
+                h('button', {
+                  key: b.id,
+                  type: 'button',
+                  onClick: () => goHomeFromMoodBanner(b.title),
+                  className:
+                    'relative min-w-0 h-[64px] sm:h-[80px] rounded-xl overflow-hidden shadow-sm border border-[#ebebeb] bg-[#e8e8e8] text-left cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111] focus-visible:ring-offset-2',
+                  'aria-label': b.title + ' 테마로 홈에서 보기',
+                },
+                  h('img', {
+                    src: b.bgImage,
+                    alt: '',
+                    className: 'absolute inset-0 w-full h-full object-cover',
+                    referrerPolicy: 'no-referrer',
+                  }),
+                  h('div', { className: 'absolute inset-0 bg-black/38 pointer-events-none' }),
+                  h('div', { className: 'absolute inset-0 flex items-center justify-center px-2 pointer-events-none' },
+                    h('span', {
+                      className: 'text-[12px] sm:text-[13px] font-bold text-center text-white leading-tight line-clamp-2',
+                      style: { textShadow: '0 1px 3px rgba(0,0,0,0.85)' },
+                    }, b.title)
+                  )
                 )
               )
-            )
-          ),
+            ),
           q && h('p', { className: 'text-[12px] text-[#888] mt-2 mb-1' }, gridProducts.length ? gridProducts.length + '건' : ''),
           q
             ? h('div', { className: 'mt-3' },
@@ -6534,6 +6581,13 @@ function App() {
                   : renderProductSpGrid(gridProducts, 'q', pickSimilar, product, { layout: 'row' })
               )
             : h('div', { className: 'space-y-4 mt-0' },
+                h('section', { className: 'min-w-0' },
+                  h('h3', { className: 'text-[17px] font-bold text-[#111] mb-1.5 tracking-tight' }, '추천 상품'),
+                  renderProductSpGrid(exploreRecommendedPicks, 'rec', pickSimilar, product, {
+                    layout: 'row',
+                    getCardImage: (sp) => (sp._exploreMoodHero ? sp._exploreMoodHero : productDisplayImage(sp)),
+                  })
+                ),
                 h('section', { className: 'min-w-0' },
                   h('h3', { className: 'text-[17px] font-bold text-[#111] mb-1.5 tracking-tight' }, '비슷한 상품'),
                   renderProductSpGrid(exploreTiers.similarList, 'sim', pickSimilar, product, { layout: 'row' })
@@ -6545,7 +6599,59 @@ function App() {
                 h('section', { className: 'min-w-0' },
                   h('h3', { className: 'text-[17px] font-bold text-[#111] mb-1.5 tracking-tight' }, '동일 브랜드 다른 상품'),
                   renderProductSpGrid(exploreTiers.sameBrandList, 'br', pickSimilar, product, { layout: 'row' })
-                )
+                ),
+                (() => {
+                  const moodBrandChips = getExploreMoodBrandChips(product);
+                  const pid = String(product.id);
+                  const moodBrandProducts =
+                    homeExploreMoodBrand &&
+                    MOCK_PRODUCTS.filter(
+                      (p) => p.brand === homeExploreMoodBrand && String(p.id) !== pid
+                    );
+                  if (moodBrandChips.length === 0) return null;
+                  return h('section', { className: 'min-w-0' },
+                    h('h3', { className: 'text-[17px] font-bold text-[#111] mb-2 tracking-tight' }, '비슷한 무드의 브랜드 추천'),
+                    h(
+                      'div',
+                      {
+                        className:
+                          'flex flex-nowrap gap-2 overflow-x-auto overflow-y-hidden pb-2 -mx-1 px-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+                      },
+                      ...moodBrandChips.map((chip) => {
+                        const sel = homeExploreMoodBrand === chip.brand;
+                        return h(
+                          'button',
+                          {
+                            type: 'button',
+                            key: 'explore-mood-brand-' + chip.brand,
+                            onClick: () => setHomeExploreMoodBrand(chip.brand),
+                            className:
+                              'shrink-0 inline-flex items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-3.5 text-[13px] font-medium transition-colors ' +
+                              (sel
+                                ? 'border-[#111] bg-[#111] text-white'
+                                : 'border-[#e5e7eb] bg-white text-[#111] hover:bg-[#fafafa]'),
+                          },
+                          h(
+                            'span',
+                            {
+                              className:
+                                'flex h-8 w-8 shrink-0 items-center justify-center rounded-full overflow-hidden leading-none ' +
+                                (sel ? 'bg-white text-[#111]' : 'bg-[#f3f4f6] text-[#111]') +
+                                (chip.logoClass ? ' ' + chip.logoClass : ''),
+                            },
+                            chip.logoText
+                          ),
+                          h('span', { className: 'whitespace-nowrap pr-0.5' }, chip.labelKo)
+                        );
+                      })
+                    ),
+                    moodBrandProducts && moodBrandProducts.length > 0
+                      ? h('div', { className: 'mt-1' },
+                          renderProductSpGrid(moodBrandProducts, 'moodbr', pickSimilar, product, { layout: 'row' })
+                        )
+                      : h('p', { className: 'mt-2 text-[13px] text-[#888]' }, '해당 브랜드의 다른 상품이 없어요.')
+                  );
+                })()
               )
         )
       )
