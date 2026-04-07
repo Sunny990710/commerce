@@ -98,7 +98,7 @@ import {
   Search, Heart, User, Home, Sparkles, ShoppingBag, ChevronLeft, ChevronUp, X, Check, Bell, Mic, Send,
   Image, Camera, ArrowUp, ArrowLeft, CheckCircle2, MapPin, CreditCard, TrendingDown, ArrowRight, ArrowUpRight, Menu, ChevronDown, ChevronRight, Star,
   ExternalLink, Share2, MoreVertical, Loader2, Settings, LogOut, AlertTriangle, Lightbulb, Plus, BarChart3, Youtube,
-  Truck, RefreshCw, PackageX, Droplets, Sun, Thermometer, Scan
+  Truck, RefreshCw, PackageX, Droplets, Sun, Thermometer,   Scan
 } from 'lucide-react';
 
 const h = React.createElement;
@@ -184,6 +184,41 @@ const MOCK_PRODUCTS = [
     { name: '그레이', hex: '#9E9E9E', stock: 4, image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80' }
   ]},
 ];
+
+function hashStringForImageSearch(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = Math.imul(31, h) + s.charCodeAt(i) | 0;
+  return Math.abs(h);
+}
+
+/** 이미지 검색 결과 그리드 썸네일 — `assets/image-search-lens/lens-01~08.png` (첨부 이미지 순) */
+const IMAGE_SEARCH_LENS_GRID_SRC = [
+  'assets/image-search-lens/lens-01.png',
+  'assets/image-search-lens/lens-02.png',
+  'assets/image-search-lens/lens-03.png',
+  'assets/image-search-lens/lens-04.png',
+  'assets/image-search-lens/lens-05.png',
+  'assets/image-search-lens/lens-06.png',
+  'assets/image-search-lens/lens-07.png',
+  'assets/image-search-lens/lens-08.png',
+];
+
+/** 업로드 파일 기준으로 유사 상품 목록(데모: 셔플 + 유사도 %) */
+function pickImageSearchSimilarItems(file) {
+  const seed = hashStringForImageSearch(String(file.name) + file.size + file.lastModified);
+  const arr = [...MOCK_PRODUCTS];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = (seed + i * 17) % (i + 1);
+    const t = arr[i];
+    arr[i] = arr[j];
+    arr[j] = t;
+  }
+  const n = Math.min(IMAGE_SEARCH_LENS_GRID_SRC.length, arr.length);
+  return arr.slice(0, n).map((p, i) => ({
+    product: p,
+    similarity: Math.max(62, 94 - i * 3 - (seed % 5)),
+  }));
+}
 
 /** 온보딩 브랜드 선택 */
 const ONBOARDING_BRAND_OPTIONS = [
@@ -341,7 +376,18 @@ function getProductFeedVibeMeta(product) {
 }
 
 /** 옷장 랭킹 코디 썸네일 풀 */
-const CLOSET_RANK_MEDIA_POOL = MOCK_PRODUCTS.map((p) => p.image);
+const CLOSET_RANK_MEDIA_POOL = [
+  'assets/pin-01.png',
+  'assets/pin-02.png',
+  'assets/pin-03.png',
+  'assets/pin-04.png',
+  'assets/pin-05.png',
+  'assets/pin-06.png',
+  'assets/pin-07.png',
+  'assets/pin-08.png',
+  'assets/pin-09.png',
+  'assets/pin-10.png',
+];
 function closetRankGalleryImages(entry) {
   const seed = parseInt(String(entry.id).replace(/\D/g, ''), 10) || 0;
   const n = CLOSET_RANK_MEDIA_POOL.length;
@@ -1389,6 +1435,8 @@ function App() {
   const [closetShowMyWishlist, setClosetShowMyWishlist] = useState(false);
   /** 옷장 랭킹: 사용자별 팔로우 토글 (데모) */
   const [closetRankFollows, setClosetRankFollows] = useState({});
+  /** 옷장 랭킹: 스냅 썸네일 클릭 상세 오버레이 */
+  const [closetRankSnapViewer, setClosetRankSnapViewer] = useState(null);
   /** null | 패셔니스타 id — 프로필 전체 화면 */
   const [closetFashionistaProfileId, setClosetFashionistaProfileId] = useState(null);
   const [closetFashionistaFeedTab, setClosetFashionistaFeedTab] = useState('snap');
@@ -1546,6 +1594,21 @@ function App() {
   const [imageSearchGuideOpen, setImageSearchGuideOpen] = useState(false);
   /** 사진 고르기 → 사진첩 / 카메라 선택 바텀시트 */
   const [imageSearchAttachSheetOpen, setImageSearchAttachSheetOpen] = useState(false);
+  /** 업로드 이미지 미리보기 + 유사 상품(데모) — 이미지 검색 결과 화면 */
+  const [imageSearchLensOpen, setImageSearchLensOpen] = useState(false);
+  const [imageSearchPreviewUrl, setImageSearchPreviewUrl] = useState(null);
+  const [imageSearchLensItems, setImageSearchLensItems] = useState([]);
+  const imageSearchObjectUrlRef = useRef(null);
+  const [imageLensFilters, setImageLensFilters] = useState(() => ({
+    pricePreset: '',
+    priceMin: '',
+    priceMax: '',
+    seller: '',
+    brand: [],
+  }));
+  const [imageLensFilterSheetOpen, setImageLensFilterSheetOpen] = useState(false);
+  const [imageLensScrollToKey, setImageLensScrollToKey] = useState(null);
+  const [imageLensBrandQuery, setImageLensBrandQuery] = useState('');
   useEffect(() => {
     if (!showUserMenu) return;
     const handleOutsideClick = (e) => {
@@ -1580,6 +1643,60 @@ function App() {
       document.body.style.overflow = prev;
     };
   }, [imageSearchGuideOpen]);
+
+  useEffect(() => {
+    if (!imageSearchLensOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [imageSearchLensOpen]);
+
+  useEffect(() => {
+    if (!imageSearchLensOpen) return;
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return;
+      if (imageLensFilterSheetOpen) {
+        setImageLensFilterSheetOpen(false);
+        return;
+      }
+      setImageSearchLensOpen(false);
+      setImageSearchLensItems([]);
+      setImageSearchPreviewUrl(null);
+      setImageLensFilters({
+        pricePreset: '',
+        priceMin: '',
+        priceMax: '',
+        seller: '',
+        brand: [],
+      });
+      setImageLensBrandQuery('');
+      if (imageSearchObjectUrlRef.current) {
+        URL.revokeObjectURL(imageSearchObjectUrlRef.current);
+        imageSearchObjectUrlRef.current = null;
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [imageSearchLensOpen, imageLensFilterSheetOpen]);
+
+  useEffect(() => {
+    if (!imageLensFilterSheetOpen) {
+      setImageLensScrollToKey(null);
+    }
+  }, [imageLensFilterSheetOpen]);
+
+  useEffect(() => {
+    if (!imageLensFilterSheetOpen || !imageLensScrollToKey) return;
+    const id = `image-lens-filter-section-${imageLensScrollToKey}`;
+    const t = window.setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      setImageLensScrollToKey(null);
+    }, 100);
+    return () => window.clearTimeout(t);
+  }, [imageLensFilterSheetOpen, imageLensScrollToKey]);
 
   useEffect(() => {
     if (!isDetailOpen) setDetailHeroImageOverride(null);
@@ -2206,6 +2323,15 @@ function App() {
     { value: 'WHO.A.U', label: 'WHO.A.U' },
   ];
 
+  /** 이미지 검색(렌즈) — 판매처 칩 (홈 필터와 동일한 칩 스타일) */
+  const IMAGE_LENS_SELLER_OPTIONS = [
+    { value: '', label: '전체' },
+    { value: '29CM', label: '29CM' },
+    { value: 'MUSINSA', label: '무신사' },
+    { value: 'ZIGZAG', label: '지그재그' },
+    { value: 'ABLY', label: '에이블리' },
+  ];
+
   const getFilterButtonLabel = (key, fallback) => {
     if (key === 'brand') {
       if (!searchFilters.brand.length) return fallback;
@@ -2287,6 +2413,19 @@ function App() {
     const situationMatch = !searchFilters.situation.length || searchFilters.situation.includes(vibe.situation);
     const seasonMatch = !searchFilters.season.length || searchFilters.season.includes(vibe.season);
     return brandMatch && colorMatch && priceMatch && categoryMatch && moodMatch && situationMatch && seasonMatch;
+  };
+
+  /** 이미지 검색 결과 그리드: 가격대·브랜드만 반영 (판매처는 목 데이터에 필드 없음) */
+  const matchesImageLensFilters = (product, f) => {
+    const brandMatch = !f.brand.length || f.brand.includes(product.brand);
+    const presetRange = PRICE_FILTER_OPTIONS.find((option) => option.value === f.pricePreset);
+    const customMin = f.priceMin ? Number(f.priceMin) : null;
+    const customMax = f.priceMax ? Number(f.priceMax) : null;
+    const minPrice = f.pricePreset === 'custom' ? customMin : (presetRange?.min ?? null);
+    const maxPrice = f.pricePreset === 'custom' ? customMax : (presetRange?.max ?? null);
+    const priceMatch =
+      (minPrice === null || product.price >= minPrice) && (maxPrice === null || product.price <= maxPrice);
+    return brandMatch && priceMatch;
   };
 
   const hasActiveSearchFilters = Boolean(
@@ -3394,15 +3533,56 @@ function App() {
     );
   };
 
+  const closeImageSearchLens = () => {
+    setImageLensFilterSheetOpen(false);
+    setImageLensScrollToKey(null);
+    setImageLensBrandQuery('');
+    setImageLensFilters({
+      pricePreset: '',
+      priceMin: '',
+      priceMax: '',
+      seller: '',
+      brand: [],
+    });
+    setImageSearchLensOpen(false);
+    setImageSearchLensItems([]);
+    setImageSearchPreviewUrl(null);
+    if (imageSearchObjectUrlRef.current) {
+      URL.revokeObjectURL(imageSearchObjectUrlRef.current);
+      imageSearchObjectUrlRef.current = null;
+    }
+  };
+
   const handleImageSearchFileDone = (e) => {
+    const file = e?.target?.files?.[0];
     setImageSearchAttachSheetOpen(false);
     setImageSearchGuideOpen(false);
     try {
       if (e && e.target) e.target.value = '';
     } catch (_) {}
+    if (!file || !file.type.startsWith('image/')) return;
+    if (imageSearchObjectUrlRef.current) {
+      URL.revokeObjectURL(imageSearchObjectUrlRef.current);
+      imageSearchObjectUrlRef.current = null;
+    }
+    const url = URL.createObjectURL(file);
+    imageSearchObjectUrlRef.current = url;
+    setImageSearchPreviewUrl(url);
+    setImageSearchLensItems(pickImageSearchSimilarItems(file));
+    setImageLensFilters({
+      pricePreset: '',
+      priceMin: '',
+      priceMax: '',
+      seller: '',
+      brand: [],
+    });
+    setImageLensFilterSheetOpen(false);
+    setImageLensScrollToKey(null);
+    setImageLensBrandQuery('');
+    setImageSearchLensOpen(true);
   };
 
-  /** 사진 고르기 → 사진첩 / 카메라 바텀시트 (가이드 위 z-index) */
+  /** 사진 고르기 → 사진첩 / 카메라 바텀시트 (가이드 위 z-index) — 파일 input은 상시 마운트(refs 유지) */
   const renderImageSearchAttachSheet = () => {
     if (!imageSearchGuideOpen || !imageSearchAttachSheetOpen) return null;
     return h('div', {
@@ -3419,21 +3599,6 @@ function App() {
         'aria-modal': true,
         'aria-labelledby': 'image-search-attach-title',
       },
-        h('input', {
-          ref: imageSearchGalleryInputRef,
-          type: 'file',
-          accept: 'image/*',
-          className: 'hidden',
-          onChange: handleImageSearchFileDone,
-        }),
-        h('input', {
-          ref: imageSearchCameraInputRef,
-          type: 'file',
-          accept: 'image/*',
-          capture: 'environment',
-          className: 'hidden',
-          onChange: handleImageSearchFileDone,
-        }),
         h('div', { className: 'relative flex items-center justify-center border-b border-[#f0f0f0] px-4 pt-4 pb-3' },
           h('h3', {
             id: 'image-search-attach-title',
@@ -3475,6 +3640,423 @@ function App() {
           },
             h(Camera, { size: 24, className: 'shrink-0 text-[#111]', strokeWidth: 1.5 }),
             h('span', { className: 'text-[16px] font-medium text-[#111]' }, '카메라')
+          )
+        )
+      )
+    );
+  };
+
+  /** 이미지 검색: 가격대·판매처·브랜드 한 페이지(홈 모바일 필터와 동일) + 탭 시 해당 섹션으로 스크롤 */
+  const renderImageLensFilterSheet = () => {
+    if (!imageLensFilterSheetOpen) return null;
+    const onClose = () => setImageLensFilterSheetOpen(false);
+    const resetImageLensFiltersAll = () => {
+      setImageLensFilters({
+        pricePreset: '',
+        priceMin: '',
+        priceMax: '',
+        seller: '',
+        brand: [],
+      });
+      setImageLensBrandQuery('');
+    };
+    const filteredCount = imageSearchLensItems.filter(({ product: p }) =>
+      matchesImageLensFilters(p, imageLensFilters)
+    ).length;
+    const bq = imageLensBrandQuery.trim().toLowerCase();
+    const filteredBrands = BRAND_FILTER_OPTIONS.filter(
+      (b) => !bq || b.label.toLowerCase().includes(bq) || b.value.toLowerCase().includes(bq)
+    );
+
+    const body = h(
+      'div',
+      { className: 'min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 [scrollbar-gutter:stable]' },
+      h(
+        'section',
+        { id: 'image-lens-filter-section-price', className: 'mb-10 scroll-mt-4' },
+        h('h3', { className: 'mb-3 text-[15px] font-bold text-[#111]' }, '가격대'),
+        h(
+          'div',
+          { className: 'divide-y divide-[#f0f0f0]' },
+          ...PRICE_FILTER_OPTIONS.filter((opt) => opt.value !== '').map((option) =>
+            h(
+              'button',
+              {
+                key: option.value,
+                type: 'button',
+                onClick: () => {
+                  setImageLensFilters((prev) => ({
+                    ...prev,
+                    pricePreset: option.value,
+                    priceMin: option.value === 'custom' ? prev.priceMin : '',
+                    priceMax: option.value === 'custom' ? prev.priceMax : '',
+                  }));
+                },
+                className: 'flex w-full items-center justify-between py-3.5 text-left',
+              },
+              h('span', { className: 'text-sm font-medium text-slate-700' }, option.label),
+              h(
+                'span',
+                {
+                  className: `flex h-5 w-5 items-center justify-center rounded-full border ${
+                    imageLensFilters.pricePreset === option.value ? 'border-[#111]' : 'border-[#ddd]'
+                  }`,
+                },
+                imageLensFilters.pricePreset === option.value
+                  ? h('span', { className: 'h-2.5 w-2.5 rounded-full bg-[#111]' })
+                  : null
+              )
+            )
+          )
+        ),
+        h('div', { className: 'mt-5 space-y-4' },
+          h('div', null,
+            h('label', { className: 'mb-2 block text-sm font-bold text-slate-800' }, '최소 가격'),
+            h('div', { className: 'relative' },
+              h('input', {
+                type: 'text',
+                inputMode: 'numeric',
+                placeholder: MOCK_PRODUCTS.length ? Math.min(...MOCK_PRODUCTS.map((p) => p.price)).toLocaleString() : '0',
+                value: formatPriceInput(imageLensFilters.priceMin),
+                onChange: (e) =>
+                  setImageLensFilters((prev) => ({
+                    ...prev,
+                    pricePreset: 'custom',
+                    priceMin: e.target.value.replace(/[^0-9]/g, ''),
+                  })),
+                className:
+                  'w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-medium text-slate-500 outline-none focus:border-slate-500',
+              }),
+              h('span', { className: 'absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400' }, '원')
+            )
+          ),
+          h('div', null,
+            h('label', { className: 'mb-2 block text-sm font-bold text-slate-800' }, '최대 가격'),
+            h('div', { className: 'relative' },
+              h('input', {
+                type: 'text',
+                inputMode: 'numeric',
+                placeholder: MOCK_PRODUCTS.length ? Math.max(...MOCK_PRODUCTS.map((p) => p.price)).toLocaleString() : '0',
+                value: formatPriceInput(imageLensFilters.priceMax),
+                onChange: (e) =>
+                  setImageLensFilters((prev) => ({
+                    ...prev,
+                    pricePreset: 'custom',
+                    priceMax: e.target.value.replace(/[^0-9]/g, ''),
+                  })),
+                className:
+                  'w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-medium text-slate-500 outline-none focus:border-slate-500',
+              }),
+              h('span', { className: 'absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400' }, '원')
+            )
+          )
+        )
+      ),
+      h(
+        'section',
+        { id: 'image-lens-filter-section-seller', className: 'mb-10 scroll-mt-4' },
+        h('h3', { className: 'mb-3 text-[15px] font-bold text-[#111]' }, '판매처'),
+        h(
+          'div',
+          { className: 'flex flex-wrap gap-2' },
+          ...IMAGE_LENS_SELLER_OPTIONS.map((option) =>
+            h(
+              'button',
+              {
+                key: option.value || 'all',
+                type: 'button',
+                onClick: () =>
+                  setImageLensFilters((prev) => ({
+                    ...prev,
+                    seller: option.value,
+                  })),
+                className: `rounded-full border px-3 py-1.5 text-[13px] font-medium transition-colors ${
+                  imageLensFilters.seller === option.value
+                    ? 'border-[#111] bg-[#111] text-white'
+                    : 'border-[#ebebeb] bg-[#f7f7f7] text-[#333] hover:bg-[#efefef]'
+                }`,
+              },
+              option.label
+            )
+          )
+        )
+      ),
+      h(
+        'section',
+        { id: 'image-lens-filter-section-brand', className: 'mb-2 scroll-mt-4' },
+        h('h3', { className: 'mb-3 text-[15px] font-bold text-[#111]' }, '브랜드'),
+        h('div', { className: 'relative mb-3' },
+          h('input', {
+            type: 'text',
+            placeholder: '브랜드를 검색하세요.',
+            value: imageLensBrandQuery,
+            onChange: (e) => setImageLensBrandQuery(e.target.value),
+            className:
+              'w-full border-b border-[#111] bg-transparent pb-2 pr-9 text-[13px] text-[#111] outline-none placeholder:text-[#aaa]',
+          }),
+          h(Search, { size: 17, className: 'pointer-events-none absolute bottom-2 right-0 text-[#aaa]', strokeWidth: 1.5 })
+        ),
+        filteredBrands.length === 0
+          ? h('p', { className: 'py-4 text-center text-[13px] text-[#999]' }, '검색 결과가 없습니다')
+          : h(
+              'div',
+              { className: 'space-y-0' },
+              ...filteredBrands.map((option) =>
+                h(
+                  'label',
+                  {
+                    key: option.value,
+                    className: 'flex cursor-pointer items-center gap-3 rounded-md px-1 py-2.5 -mx-1 hover:bg-[#fafafa]',
+                  },
+                  h('input', {
+                    type: 'checkbox',
+                    checked: imageLensFilters.brand.includes(option.value),
+                    onChange: () => {
+                      setImageLensFilters((prev) => ({
+                        ...prev,
+                        brand: prev.brand.includes(option.value)
+                          ? prev.brand.filter((v) => v !== option.value)
+                          : [...prev.brand, option.value],
+                      }));
+                    },
+                    className:
+                      'h-4 w-4 shrink-0 rounded border-[#ccc] text-[#111] accent-[#111] focus:ring-[#111] focus:ring-offset-0',
+                  }),
+                  h('span', { className: 'select-none text-[13px] font-normal text-[#333]' }, option.label)
+                )
+              )
+            )
+      )
+    );
+
+    return h(
+      'div',
+      {
+        className:
+          'fixed inset-0 z-[125] flex flex-col bg-white animate-fadeIn max-h-[100dvh] pt-[env(safe-area-inset-top,0px)]',
+        role: 'dialog',
+        'aria-modal': 'true',
+        'aria-labelledby': 'image-lens-filter-sheet-title',
+      },
+      h(
+        'header',
+        { className: 'relative flex shrink-0 items-center justify-center border-b border-[#ebebeb] px-4 py-3.5' },
+        h('h2', { id: 'image-lens-filter-sheet-title', className: 'text-[16px] font-semibold text-[#111]' }, '필터'),
+        h(
+          'button',
+          {
+            type: 'button',
+            onClick: onClose,
+            className: 'absolute right-2 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full text-[#555] hover:bg-[#f0f0f0]',
+            'aria-label': '닫기',
+          },
+          h(X, { size: 22, strokeWidth: 1.5 })
+        )
+      ),
+      body,
+      h(
+        'footer',
+        {
+          className:
+            'flex shrink-0 gap-2 border-t border-[#ebebeb] bg-white px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]',
+        },
+        h(
+          'button',
+          {
+            type: 'button',
+            onClick: resetImageLensFiltersAll,
+            className:
+              'shrink-0 rounded-xl border border-[#ebebeb] bg-white px-4 py-3.5 text-[14px] font-semibold text-[#333] transition-colors hover:bg-[#fafafa]',
+          },
+          '초기화'
+        ),
+        h(
+          'button',
+          {
+            type: 'button',
+            onClick: onClose,
+            className:
+              'min-w-0 flex-1 rounded-xl bg-[#111] px-4 py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#333]',
+          },
+          `${filteredCount.toLocaleString()}개 결과보기`
+        )
+      )
+    );
+  };
+
+  /** 업로드 이미지 기준 유사 상품(데모) — 이미지 검색 결과 화면 */
+  const renderImageSearchLensOverlay = () => {
+    if (!imageSearchLensOpen || !imageSearchPreviewUrl) return null;
+    const imageLensFilteredItems = imageSearchLensItems.filter(({ product: p }) =>
+      matchesImageLensFilters(p, imageLensFilters)
+    );
+    return h(
+      'div',
+      {
+        className: 'fixed inset-0 z-[115] flex flex-col bg-[#eef0f3]',
+        role: 'dialog',
+        'aria-modal': true,
+        'aria-labelledby': 'image-search-lens-title',
+      },
+      h(
+        'header',
+        {
+          className:
+            'relative shrink-0 flex min-h-[48px] items-center justify-center border-b border-[#e5e7eb] bg-white px-2 pb-2 pt-[max(0.5rem,env(safe-area-inset-top,0px))]',
+        },
+        h(
+          'button',
+          {
+            type: 'button',
+            onClick: closeImageSearchLens,
+            className:
+              'absolute left-1 top-1/2 z-[1] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-[#111] hover:bg-[#f3f4f6]',
+            'aria-label': '닫기',
+          },
+          h(ChevronLeft, { size: 24, strokeWidth: 1.5 })
+        ),
+        h(
+          'h1',
+          {
+            id: 'image-search-lens-title',
+            className: 'text-center text-[16px] font-bold tracking-tight text-[#111]',
+          },
+          '이미지 검색하기'
+        )
+      ),
+      h(
+        'div',
+        { className: 'min-h-0 flex-1 overflow-y-auto no-scrollbar' },
+        h('div', { className: 'flex flex-col gap-4 px-4 py-4' },
+          h('div', { className: 'relative mx-auto max-w-sm' },
+            h('div', { className: 'relative rounded-xl bg-[#dfe3e8] p-4 pb-5 pt-5' },
+              h('div', { className: 'pointer-events-none absolute left-3 top-3 z-[1] h-5 w-5 rounded-tl border-l-[3px] border-t-[3px] border-[#2563eb]' }),
+              h('div', { className: 'pointer-events-none absolute right-3 top-3 z-[1] h-5 w-5 rounded-tr border-r-[3px] border-t-[3px] border-[#2563eb]' }),
+              h('div', { className: 'pointer-events-none absolute bottom-3 left-3 z-[1] h-5 w-5 rounded-bl border-b-[3px] border-l-[3px] border-[#2563eb]' }),
+              h('div', { className: 'pointer-events-none absolute bottom-3 right-3 z-[1] h-5 w-5 rounded-br border-b-[3px] border-r-[3px] border-[#2563eb]' }),
+              h('div', { className: 'relative mx-auto aspect-[4/5] max-h-[min(52vh,420px)] overflow-hidden rounded-lg bg-white shadow-inner' },
+                h('img', {
+                  src: imageSearchPreviewUrl,
+                  alt: '업로드한 이미지',
+                  className: 'h-full w-full object-contain',
+                })
+              )
+            )
+          ),
+          h(
+            'div',
+            {
+              className:
+                'rounded-t-[1.25rem] border border-[#e8eaed] bg-white px-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] pt-3 shadow-[0_-4px_24px_rgba(0,0,0,0.06)]',
+            },
+            h('div', { className: 'mx-auto mb-3 h-1 w-10 rounded-full bg-[#ddd]' }),
+            h(
+              'p',
+              { className: 'mb-3 text-left text-[15px] font-bold leading-snug text-[#111]' },
+              '유사한 상품을 찾았어요!'
+            ),
+            h(
+              'div',
+              { className: 'mb-4 flex flex-wrap items-center justify-between gap-x-2 gap-y-2' },
+              h(
+                'span',
+                {
+                  className:
+                    'inline-flex shrink-0 items-center rounded-full bg-[#111] px-3.5 py-1.5 text-[12px] font-semibold text-white',
+                },
+                '상의'
+              ),
+              h(
+                'div',
+                { className: 'flex flex-wrap justify-end gap-2' },
+                [
+                  ['가격대', 'price'],
+                  ['판매처', 'seller'],
+                  ['브랜드', 'brand'],
+                ].map(([label, sheetKey]) =>
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      key: sheetKey,
+                      onClick: () => {
+                        setImageLensFilterSheetOpen(true);
+                        setImageLensScrollToKey(sheetKey);
+                      },
+                      className:
+                        'rounded-full border border-[#e5e7eb] bg-[#fafafa] px-3 py-1.5 text-[12px] font-medium text-[#333] active:bg-[#f3f4f6]',
+                    },
+                    label
+                  )
+                )
+              )
+            ),
+            h('div', { className: 'mb-4 flex flex-wrap items-center justify-between gap-2 text-[12px] text-[#555]' },
+              h(
+                'span',
+                { className: 'rounded-md border border-[#ebebeb] bg-white px-2 py-1 font-medium text-[#111]' },
+                '유사도순'
+              ),
+              h(
+                'span',
+                { className: 'shrink-0 font-medium text-[#111]' },
+                '전체 상품 ',
+                imageLensFilteredItems.length,
+                '개'
+              )
+            ),
+            imageLensFilteredItems.length === 0
+              ? h(
+                  'p',
+                  { className: 'py-10 text-center text-[13px] font-medium text-[#888]' },
+                  '조건에 맞는 상품이 없어요.'
+                )
+              : h(
+                  'div',
+                  { className: 'grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-3' },
+                  ...imageLensFilteredItems.map(({ product: p, similarity }) => {
+                    const idx = imageSearchLensItems.findIndex((item) => item.product.id === p.id);
+                    return h(
+                      'button',
+                      {
+                        type: 'button',
+                        key: 'lens-' + p.id + '-' + idx,
+                        className:
+                          'group overflow-hidden rounded-xl border border-[#ebebeb] bg-[#fafafa] text-left shadow-sm transition-shadow hover:shadow-md',
+                        onClick: () => {
+                          const heroSrc =
+                            (idx >= 0 ? IMAGE_SEARCH_LENS_GRID_SRC[idx] : null) || productDisplayImage(p);
+                          closeImageSearchLens();
+                          setView((v) => (v === 'HOME' || v === 'SEARCH' ? v : 'HOME'));
+                          setHomeExplore({ product: p, heroSrc });
+                        },
+                      },
+                      h('div', { className: 'relative aspect-[3/4] overflow-hidden bg-[#eceef1]' },
+                        h('img', {
+                          src: (idx >= 0 ? IMAGE_SEARCH_LENS_GRID_SRC[idx] : null) || p.image,
+                          alt: '',
+                          className: 'h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]',
+                          referrerPolicy: 'no-referrer',
+                        }),
+                        h(
+                          'div',
+                          {
+                            className:
+                              'absolute bottom-2 left-2 rounded-md bg-black/70 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur-[2px]',
+                          },
+                          '유사도 ',
+                          similarity,
+                          '%'
+                        )
+                      ),
+                      h('div', { className: 'p-2.5' },
+                        h('p', { className: 'text-[10px] font-bold uppercase tracking-wide text-[#888]' }, p.brand),
+                        h('p', { className: 'mt-0.5 line-clamp-2 text-[12px] font-medium leading-snug text-[#111]' }, p.name),
+                        h('p', { className: 'mt-1 text-[13px] font-bold text-[#111]' }, fmt(p.price))
+                      )
+                    );
+                  })
+                )
           )
         )
       )
@@ -4656,9 +5238,26 @@ function App() {
                     ),
                     h('div', { className: 'flex gap-1.5 mt-3 overflow-x-auto no-scrollbar pb-0.5 -mx-0.5 px-0.5' },
                       ...gallery.map((src, gi) =>
-                        h('div', {
+                        h('button', {
                           key: entry.id + '-g-' + gi,
-                          className: 'relative shrink-0 w-[4.25rem] sm:w-[5rem] aspect-[3/4] rounded-lg overflow-hidden bg-[#f0f0f0]',
+                          type: 'button',
+                          onClick: () => {
+                            const baseIdx = (idx * 3 + gi) % MOCK_PRODUCTS.length;
+                            const items = [
+                              MOCK_PRODUCTS[baseIdx % MOCK_PRODUCTS.length],
+                              MOCK_PRODUCTS[(baseIdx + 1) % MOCK_PRODUCTS.length],
+                              MOCK_PRODUCTS[(baseIdx + 2) % MOCK_PRODUCTS.length],
+                            ].filter(Boolean);
+                            setClosetRankSnapViewer({
+                              entry,
+                              src,
+                              page: `${gi + 1}/${gallery.length}`,
+                              items,
+                            });
+                          },
+                          className:
+                            'relative shrink-0 w-[4.25rem] sm:w-[5rem] aspect-[3/4] rounded-lg overflow-hidden bg-[#f0f0f0] ' +
+                            'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111]/20',
                         },
                           h('img', { src, alt: '', className: 'w-full h-full object-cover', referrerPolicy: 'no-referrer' }),
                           h('div', { className: 'absolute bottom-1 right-1 pointer-events-none' },
@@ -4899,6 +5498,70 @@ function App() {
                 h('img', { src, alt: '', className: 'w-full h-full object-cover', referrerPolicy: 'no-referrer' }),
                 h('div', { className: 'absolute bottom-1 right-1 pointer-events-none' },
                   h(Heart, { size: 14, className: 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.65)]', strokeWidth: 2, fill: 'none' })
+                )
+              )
+            )
+          )
+        )
+      )
+    );
+  };
+
+  const renderClosetRankSnapViewer = () => {
+    if (!closetRankSnapViewer) return null;
+    const snap = closetRankSnapViewer;
+    return h(
+      'div',
+      {
+        className: 'fixed inset-0 z-[140] flex items-end justify-center bg-black/45 backdrop-blur-[1px] md:items-center md:p-4',
+        role: 'dialog',
+        'aria-modal': true,
+        onClick: () => setClosetRankSnapViewer(null),
+      },
+      h('div', {
+        className:
+          'relative w-full max-w-[700px] rounded-t-2xl bg-white shadow-[0_-8px_40px_rgba(0,0,0,0.12)] ' +
+          'md:rounded-2xl border border-[#ebebeb] overflow-hidden max-h-[92vh] overflow-y-auto',
+        onClick: (e) => e.stopPropagation(),
+      },
+        h('div', { className: 'flex items-center justify-between px-4 py-3 border-b border-[#f0f0f0]' },
+          h('div', { className: 'flex items-center gap-2 min-w-0' },
+            h('div', { className: 'w-8 h-8 rounded-full overflow-hidden border border-[#ebebeb] bg-[#f5f5f5]' },
+              h('img', { src: snap.entry.image, alt: '', className: 'w-full h-full object-cover', referrerPolicy: 'no-referrer' })
+            ),
+            h('p', { className: 'text-[14px] font-semibold text-[#111] truncate' }, snap.entry.nickname)
+          ),
+          h('button', {
+            type: 'button',
+            onClick: () => setClosetRankSnapViewer(null),
+            className: 'p-2 rounded-full hover:bg-[#f5f5f5] text-[#666]',
+            'aria-label': '닫기',
+          }, h(X, { size: 18, strokeWidth: 1.75 }))
+        ),
+        h('div', { className: 'relative bg-[#f3f3f3]' },
+          h('img', { src: snap.src, alt: '', className: 'w-full h-auto object-cover', referrerPolicy: 'no-referrer' }),
+          h('div', { className: 'absolute bottom-3 right-3 rounded-md bg-black/40 px-2 py-0.5 text-[11px] font-medium text-white' }, snap.page)
+        ),
+        h('div', { className: 'p-3 border-t border-[#f0f0f0] bg-white' },
+          h('div', { className: 'grid grid-cols-3 gap-2' },
+            ...snap.items.map((p, i) =>
+              h('button', {
+                key: 'snap-item-' + i + '-' + p.id,
+                type: 'button',
+                onClick: () => {
+                  setClosetRankSnapViewer(null);
+                  setSelectedProduct(p);
+                  setDetailColorIdx(0);
+                  setDetailTab('REVIEW');
+                  setIsDetailOpen(true);
+                },
+                className: 'text-left rounded-lg border border-[#ebebeb] overflow-hidden bg-white',
+              },
+                h('img', { src: productDisplayImage(p), alt: '', className: 'aspect-square w-full object-cover', referrerPolicy: 'no-referrer' }),
+                h('div', { className: 'p-2' },
+                  h('p', { className: 'text-[10px] text-[#888] truncate' }, p.brand),
+                  h('p', { className: 'text-[11px] font-semibold text-[#111] line-clamp-2 leading-snug mt-0.5' }, p.name),
+                  h('p', { className: 'text-[12px] font-bold text-[#111] mt-1' }, fmt(p.price))
                 )
               )
             )
@@ -7207,9 +7870,33 @@ function App() {
       )
     ),
     homeExplore ? renderHomeExploreOverlay() : null,
+    h(React.Fragment, null,
+      h('input', {
+        ref: imageSearchGalleryInputRef,
+        type: 'file',
+        accept: 'image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif',
+        className: 'hidden',
+        'aria-hidden': true,
+        tabIndex: -1,
+        onChange: handleImageSearchFileDone,
+      }),
+      h('input', {
+        ref: imageSearchCameraInputRef,
+        type: 'file',
+        accept: 'image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif',
+        capture: 'environment',
+        className: 'hidden',
+        'aria-hidden': true,
+        tabIndex: -1,
+        onChange: handleImageSearchFileDone,
+      })
+    ),
     renderImageSearchGuideOverlay(),
     renderImageSearchAttachSheet(),
+    renderImageSearchLensOverlay(),
+    renderImageLensFilterSheet(),
     stylePersonaScreenOpen ? renderStylePersonaOverlay() : null,
+    renderClosetRankSnapViewer(),
     isDetailOpen && selectedProduct ? renderProductDetail() : null,
     isModalOpen && selectedProduct ? h(PriceTrackModal, { product: selectedProduct, onClose: () => setIsModalOpen(false), onStartTracking: handleStartTracking }) : null,
     chatInsightProduct ? h('div', { className: 'fixed inset-0 z-[95] flex items-end justify-center md:items-center md:p-6', role: 'dialog', 'aria-modal': true, 'aria-labelledby': 'chat-insight-title' },
