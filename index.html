@@ -604,7 +604,15 @@ const CLOSET_FASHION_INSIGHTS = {
   ],
 };
 
-/** 옷장 탭: 코디 아이디어 칩 */
+/** 옷장 탭: 무드 태그 선택 시 하단에 표시할 가로 코디 갤러리(데모) */
+const CLOSET_COORDI_IDEA_GALLERY = [
+  { id: 'g1', image: '/assets/closet/coordi-idea-1.png', caption: '그래픽 스웻 & 플리스 레이어드 룩' },
+  { id: 'g2', image: '/assets/closet/coordi-idea-2.png', caption: '페미닌 블라우스 & 스트레이트 데님' },
+  { id: 'g3', image: '/assets/closet/coordi-idea-3.png', caption: '스트라이프 니트 & 플레어 데님' },
+  { id: 'g4', image: '/assets/closet/coordi-idea-4.png', caption: '옐로 카디건 & 와이드 슬랙스' },
+];
+
+/** 옷장 탭: 코디 아이디어 무드 칩 — 탭 시 하단 가로 코디 갤러리 */
 const CLOSET_COORDI_IDEAS = [
   { id: 'cd1', label: '미니멀 데일리', variant: 'gray' },
   { id: 'cd2', label: '스트리트 캐주얼', variant: 'purple' },
@@ -643,35 +651,43 @@ const HOME_EXPLORE_REVIEW_ROWS = [
 const EXPLORE_STYLE_GUIDE_CHIPS = {
   ellie: [
     '클래식하면서도 위트 있는 프레피룩 좋아하는데, 개강때 입을만한 니트 코디 추천해줘.',
-    '차분하고 여성스러운 무드의 데이트룩',
-    '꾸안꾸 느낌으로 자연스럽게 예쁜 후드',
+    '카페나 전시회처럼 편하게 돌아다니는 일정에 잘 어울리는 차분하고 여성스러운 무드의 데이트룩 추천해줘.',
+    '집 앞에 영화관 걸 때 꾸안꾸 느낌으로 자연스럽게 예쁜 후드 코디 추천해줘.',
   ],
   jay: [
-    '2026 패션 트렌드 반영한 원피스 추천해줘.',
-    '20대 사이에 유행하는 가디건 알고 싶어.',
-    '요즘 많이 보이는 자켓 스타일은?',
+    '화사가 청룡영화제에서 굿굿바이 불렀을 때 입었던 착장 알려줘.',
+    '솔로지옥 최미나수가 입었던 노란색 드레스랑 비슷한 제품 알려줘.',
+    '제니가 입은 자크뮈스 검은 드레스랑 비슷한 드레스 찾아줘.',
   ],
   sarah: [
+    '미세키서울 특유의 감성을 좋아하는데, 비슷한 무드의 브랜드 아이템 추천해줘.',
     '굵은 다리를 커버할 수 있는 바지 추천해줘.',
-    '나와 잘 어울리는 색상의 원피스는?',
-    '내 체형이면 피해야 하는 셔츠 넥라인이 있을까?',
+    '여름 쿨톤에 잘 어울리는 셔츠 추천해줘.',
   ],
 };
 
 /** 대화 탭: 더비 첫 번째 가이드 질문 클릭 시 고정 답변 */
-const EXPLORE_JAY_2026_DRESS_PROMPT = '2026 패션 트렌드 반영한 원피스 추천해줘.';
+const EXPLORE_JAY_2026_DRESS_PROMPT = '화사가 청룡영화제에서 굿굿바이 불렀을 때 입었던 착장 알려줘.';
 const EXPLORE_JAY_2026_DRESS_REPLY =
-  '2026 원피스 트렌드는 빈티지 디테일과 레이어드 감성이 주목받고 있어! 너무 클래식하지 않으면서도 분위기 있게 입기 좋은 빈티지 플로럴 원피스 스타일을 추천해줄게.\n\n' +
-  '📌 **플브 슬리브리스 롱 원피스:** 편하면서도 데일리하게 입기 쉬운 원피스예요. 가디건이나 얇은 재킷이랑 겹쳐 입으면 레이어드 느낌이 자연스럽게 살아나서, 출근룩이나 데이트룩으로 활용도가 높아요.\n' +
-  '📌 **플로럴 러플 디테일 원피스:** 실루엣과 디테일이 조금 더 여성스럽고 정돈된 느낌이라, 단순히 빈티지한 것보다 “조금 더 감도 있고 갖춰 입은 느낌”을 원할 때 추천하기 좋아요.\n' +
-  '📌 **로데 플로럴 원피스:** 너무 과하지 않으면서도 분위기를 확실히 만들어주는 쪽이라, 감도 있게 입고 싶을 때 잘 맞아요.';
+  '화사가 청룡영화제에서 선보인 착장은 **오프숄더 코르셋 웨딩 드레스**예요\n\n' +
+  '흘러내린 어깨 끈과 코르셋 디테일로 상체 라인을 강조하면서도, 풍성한 볼륨감과 슬릿 디자인으로 건강하고 섹시한 매력을 동시에 표현했죠.\n\n' +
+  '✨**플로움 오프숄더 드레스**: 새틴 소재로 우아한 광택감이 있어요.\n' +
+  '✨**신스덴 코르셋 원피스**: 하트넥과 씬스트랩으로 페미닌한 라인을 살렸어요.\n' +
+  '✨**레이디볼륨 벌룬 드레스**: 스퀘어넥에 볼륨감 있는 실루엣으로 큐트하면서도 세련된 느낌이에요.';
+const EXPLORE_SARAH_BRAND_PROMPT = '미세키서울 특유의 감성을 좋아하는데, 비슷한 무드의 브랜드 아이템 추천해줘.';
+const EXPLORE_SARAH_BRAND_REPLY =
+  '미세키서울은 일본 특유의 감성을 서울의 트렌디한 무드와 결합한 브랜드로, **소녀스러움 + 빈티지 + 트렌디**한 무드를 담고 있어요.\n\n' +
+  '미세키서울과 비슷한 느낌의 브랜드로 **오헤시오**를 추천드립니다. 빈티지한 도트·체크 패턴, 러블리한 디테일, 2000년대 일본 아카이브 감성이 강점인 브랜드예요.\n\n' +
+  '⚡**HENLEY NECK BUTTON LONG SLEEVE**: 오헤시오 특유의 소녀적·빈티지한 감성을 가장 부담 없이 시작하기 좋은 기본템이예요.\n' +
+  '⚡**SHEER DRAPE BANDING SKIRT**: 오헤시오의 레이어링 무드와 여성스러운 실루엣이 가장 잘 보이는 제품이라 브랜드 결을 체감하기 좋은 아이템이예요.\n' +
+  '⚡**ROUNDED COLLAR COTTON JACKET**: 26 S/S 컬렉션 아우터 라인에서 라운디드 카라와 베이지 톤이 오헤시오 특유의 빈티지·걸리시 무드를 잘 살려줘요.';
 
 /** 대화 탭: 아래 문구 중 하나와 정확히 일치하면 프레피 룩북 전용 응답(동일 레이아웃) */
 const EXPLORE_PREPPY_LOOKBOOK_PROMPTS = [
   '클래식하면서도 위트 있는 프레피룩 좋아하는데, 개강때 입을만한 니트 코디 추천해줘.',
-  '차분하고 여성스러운 무드의 데이트룩',
-  '꾸안꾸 느낌으로 자연스럽게 예쁜 후드',
-  '차분하고 여성스러운 무드의 데이트룩, 꾸안꾸 느낌으로 자연스럽게 예쁜 후드도 좋아하는데, 클래식하면서도 위트 있는 프레피룩 좋아하는데, 개강때 입을만한 니트 코디 추천해줘.',
+  '카페나 전시회처럼 편하게 돌아다니는 일정에 잘 어울리는 차분하고 여성스러운 무드의 데이트룩 추천해줘.',
+  '집 앞에 영화관 걸 때 꾸안꾸 느낌으로 자연스럽게 예쁜 후드 코디 추천해줘.',
+  '카페나 전시회처럼 편하게 돌아다니는 일정에 잘 어울리는 차분하고 여성스러운 무드의 데이트룩 추천해줘. 집 앞에 영화관 걸 때 꾸안꾸 느낌으로 자연스럽게 예쁜 후드 코디 추천해줘. 클래식하면서도 위트 있는 프레피룩 좋아하는데, 개강때 입을만한 니트 코디 추천해줘.',
 ];
 /** 프레피 룩북: 도입(룩북 UI 위) */
 const EXPLORE_PREPPY_LOOKBOOK_REPLY_INTRO =
@@ -785,9 +801,9 @@ const STYLE_STYLISTS = [
     name: '더비',
     tags: ['트렌드세터', '세련', '센스'],
     intro:
-      '평범한 스타일 말고, 더 세련된 아이템을 찾고 있어? 분위기 살리고 센스까지 챙기는 패션 아이템, 내가 제대로 알려줄게. 💥',
+      '평범한 스타일 말고, 요즘 핫한 무드의 아이템을 찾고 있어? 셀럽 착장처럼 눈에 띄는 룩부터 비슷한 아이템까지 센스 있게 찾아줄게. 💥',
     greeting:
-      '안녕! 트렌드세터 더비야 💥 평범한 코디 말고 센스 있는 거 찾는 거면, 나한테 바로 말해!',
+      '안녕! 트렌드세터 더비야 💥 연예인 착장, 무대룩, 드라마 속 스타일처럼 눈에 들어온 룩이 있다면 말해줘. 비슷한 무드의 아이템이나 현실적으로 입기 좋은 스타일로 바로 찾아줄게!',
     tonePrompt:
       '반드시 활기찬 반말 톤으로 작성하세요(~야, ~해, ~봐, ~거야). 에너지 넘치고 트렌디하게, 💥 이모지를 적절히 섞습니다. 무례하지 않게 유지하세요.',
     avatarClass: 'bg-gradient-to-br from-emerald-200 via-green-100 to-teal-200',
@@ -1377,6 +1393,8 @@ function App() {
   const [closetFashionistaProfileId, setClosetFashionistaProfileId] = useState(null);
   const [closetFashionistaFeedTab, setClosetFashionistaFeedTab] = useState('snap');
   const [closetFashionistaProfileFollow, setClosetFashionistaProfileFollow] = useState({});
+  /** 옷장: 선택된 무드 태그 id — 값이 있으면 코디 아이디어 가로 갤러리 표시 */
+  const [closetCoordiSelectedTagId, setClosetCoordiSelectedTagId] = useState(null);
   /** null | 'home' | 'explore' | 'closet' — 검색 제안 드롭다운 */
   const [searchOverlayOpen, setSearchOverlayOpen] = useState(null);
   const [detailTab, setDetailTab] = useState('REVIEW');
@@ -1479,6 +1497,24 @@ function App() {
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [homeFilterSheetOpen]);
+  const restartOnboarding = () => {
+    try {
+      localStorage.removeItem('commerce_onboarding_done');
+      localStorage.removeItem('commerce_onboarding_brands');
+      localStorage.removeItem('commerce_onboarding_price_tier');
+      localStorage.removeItem('commerce_onboarding_gender');
+      localStorage.removeItem('commerce_onboarding_body');
+    } catch (_) {}
+    setOnboardingStep(0);
+    setOnboardingStylePick(new Set());
+    setOnboardingBrandPick(new Set());
+    setOnboardingBrandQuery('');
+    setOnboardingPriceTier(null);
+    setOnboardingAge('26');
+    setOnboardingHeightCm('165');
+    setOnboardingWeightKg('50');
+    setShowOnboarding(true);
+  };
   const [searchShowMoreProducts, setSearchShowMoreProducts] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [chatInsightProduct, setChatInsightProduct] = useState(null);
@@ -1819,7 +1855,22 @@ function App() {
       await new Promise((r) => setTimeout(r, 420));
       const q = trimmed.toLowerCase();
       const ids = ['5', '4', '3'];
-      const shown = ids.map((id) => MOCK_PRODUCTS.find((p) => p.id === id)).filter(Boolean);
+      const customDressImages = [
+        '/assets/explore/jay-hwasa-1.png',
+        '/assets/explore/jay-hwasa-2.png',
+        '/assets/explore/jay-hwasa-3.png',
+      ];
+      const shown = ids
+        .map((id, i) => {
+          const base = MOCK_PRODUCTS.find((p) => p.id === id);
+          if (!base) return null;
+          return {
+            ...base,
+            id: 'jay-hwasa-' + (i + 1),
+            image: customDressImages[i] || base.image,
+          };
+        })
+        .filter(Boolean);
       setExploreFilteredProducts(expandChatSearchProductList(shown, 15));
       setExploreMessages([
         ...newMessages,
@@ -1828,6 +1879,51 @@ function App() {
           content: EXPLORE_JAY_2026_DRESS_REPLY,
           stylistId: 'jay',
           blocks: buildExploreRichBlocks(shown, input, q, 'jay'),
+        },
+      ]);
+      setIsSearching(false);
+      return;
+    }
+    if (trimmed === EXPLORE_SARAH_BRAND_PROMPT && selectedStylistId === 'sarah') {
+      const userMessage = { role: 'user', content: input };
+      const newMessages = [...exploreMessages, userMessage];
+      setExploreChatInput('');
+      setSearchShowMoreProducts(false);
+      setRelatedProducts([]);
+      setRelatedLabel('');
+      setIsSearching(true);
+      await new Promise((r) => setTimeout(r, 420));
+      const ids = ['5', '4', '3'];
+      const customBrandImages = [
+        '/assets/explore/sarah-brand-1.png',
+        '/assets/explore/sarah-brand-2.png',
+        '/assets/explore/sarah-brand-3.png',
+      ];
+      const shown = ids
+        .map((id, i) => {
+          const base = MOCK_PRODUCTS.find((p) => p.id === id);
+          if (!base) return null;
+          return {
+            ...base,
+            id: 'sarah-brand-list-' + (i + 1),
+            image: customBrandImages[i] || base.image,
+          };
+        })
+        .filter(Boolean);
+      setExploreFilteredProducts([]);
+      setExploreMessages([
+        ...newMessages,
+        {
+          role: 'assistant',
+          content: EXPLORE_SARAH_BRAND_REPLY,
+          stylistId: 'sarah',
+          blocks: [
+            {
+              type: 'brandMoodSplit',
+              items: shown,
+              moodImage: '/assets/explore/sarah-brand-mood.png',
+            },
+          ],
         },
       ]);
       setIsSearching(false);
@@ -1968,6 +2064,7 @@ function App() {
     setOnboardingHeightCm('165');
     setOnboardingWeightKg('50');
     setShowOnboarding(false);
+    setView('HOME');
   };
   /** 온보딩 분석(5단계) 5초 후 결과(6단계) */
   useEffect(() => {
@@ -2329,11 +2426,13 @@ function App() {
           ),
           discount > 0
             ? h('span', {
-                className: 'inline-block mt-1.5 bg-[#f0f0f0] text-[#888] text-[10px] font-medium px-1.5 py-0.5 rounded',
+                className:
+                  'inline-flex w-fit self-start mt-1.5 bg-[#f0f0f0] text-[#888] text-[10px] font-medium px-1.5 py-0.5 rounded',
               }, '쿠폰')
             : sp.tag
               ? h('span', {
-                  className: 'inline-block mt-1.5 bg-[#f0f0f0] text-[#888] text-[10px] font-medium px-1.5 py-0.5 rounded',
+                  className:
+                    'inline-flex w-fit self-start mt-1.5 bg-[#f0f0f0] text-[#888] text-[10px] font-medium px-1.5 py-0.5 rounded',
                 }, sp.tag)
               : null
         )
@@ -3807,6 +3906,64 @@ function App() {
           formatExploreAssistantContent(block.text)
         );
       }
+      if (block.type === 'brandMoodSplit') {
+        const items = (block.items || []).slice(0, 3);
+        return h(
+          'div',
+          { key: bi, className: 'mt-3 rounded-2xl bg-white p-2 sm:p-3' },
+          h(
+            'div',
+            { className: 'grid grid-cols-1 gap-2 md:grid-cols-[1.05fr_1fr] md:gap-3' },
+            h(
+              'div',
+              { className: 'overflow-hidden rounded-lg border border-[#e5e7eb] bg-white' },
+              h('img', {
+                src: block.moodImage,
+                alt: '',
+                className: 'h-full w-full min-h-[210px] object-cover',
+                loading: 'lazy',
+                decoding: 'async',
+                referrerPolicy: 'no-referrer',
+              })
+            ),
+            h(
+              'div',
+              { className: 'flex flex-col gap-2' },
+              ...items.map((it, ii) =>
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    key: 'brand-mood-item-' + ii,
+                    onClick: () => openExploreFromChat(it),
+                    className:
+                      'flex items-start gap-2 rounded-lg border border-[#e5e7eb] bg-white p-2 text-left hover:border-[#cbd5e1] transition-colors',
+                  },
+                  h(
+                    'div',
+                    { className: 'w-[74px] h-[74px] shrink-0 overflow-hidden rounded-md bg-[#f3f4f6]' },
+                    h('img', {
+                      src: productDisplayImage(it),
+                      alt: '',
+                      className: 'h-full w-full object-cover',
+                      loading: 'lazy',
+                      decoding: 'async',
+                      referrerPolicy: 'no-referrer',
+                    })
+                  ),
+                  h('div', { className: 'min-w-0 flex-1' },
+                    h('p', { className: 'text-[10px] text-[#6b7280] truncate' }, it.brand),
+                    h('p', { className: 'text-[11px] font-semibold text-[#111] leading-snug line-clamp-2 mt-0.5' }, it.name),
+                    h('p', { className: 'text-[10px] text-[#9ca3af] line-through mt-1' }, fmt(Math.round(it.price * 1.5))),
+                    h('p', { className: 'text-[12px] font-bold text-[#f97316] leading-none mt-1' }, Math.floor(30 + ii) + '%'),
+                    h('p', { className: 'text-[13px] font-bold text-[#111] leading-none mt-1' }, fmt(it.price))
+                  )
+                )
+              )
+            )
+          )
+        );
+      }
       if (block.type === 'lookbookMatch') {
         const accent = 'text-rose-500';
         const items = block.items || [];
@@ -4256,12 +4413,14 @@ function App() {
     const insightList = CLOSET_FASHION_INSIGHTS[closetInsightTab] || CLOSET_FASHION_INSIGHTS.rec;
     const insightSlice = insightList.slice(0, closetInsightExpanded ? insightList.length : Math.min(4, insightList.length));
     const insightCanToggle = insightList.length > 4;
-    const coordiChipClass = (variant) => {
-      const base = 'rounded-full px-3.5 py-2 text-[12px] sm:text-[13px] font-medium transition-opacity hover:opacity-95 text-center max-w-full';
-      if (variant === 'purple') return base + ' bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-sm';
-      if (variant === 'blue') return base + ' bg-gradient-to-r from-sky-400 to-blue-600 text-white shadow-sm';
-      if (variant === 'teal') return base + ' bg-gradient-to-r from-teal-400 to-emerald-600 text-white shadow-sm';
-      return base + ' bg-[#ececec] text-[#333] hover:bg-[#e3e3e3]';
+    const coordiChipClass = (variant, selected) => {
+      const base =
+        'rounded-full px-3.5 py-2 text-[12px] sm:text-[13px] font-medium transition-all text-center max-w-full';
+      const sel = selected ? ' ring-2 ring-[#111]/35 ring-offset-1' : '';
+      if (variant === 'purple') return base + sel + ' bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-sm hover:opacity-95';
+      if (variant === 'blue') return base + sel + ' bg-gradient-to-r from-sky-400 to-blue-600 text-white shadow-sm hover:opacity-95';
+      if (variant === 'teal') return base + sel + ' bg-gradient-to-r from-teal-400 to-emerald-600 text-white shadow-sm hover:opacity-95';
+      return base + sel + ' bg-[#ececec] text-[#333] hover:bg-[#e3e3e3]';
     };
     const renderWishlistBlock = () =>
       wishClothes.length === 0
@@ -4581,11 +4740,61 @@ function App() {
             ...CLOSET_COORDI_IDEAS.map((c) =>
               h(
                 'button',
-                { key: c.id, type: 'button', className: coordiChipClass(c.variant) },
+                {
+                  key: c.id,
+                  type: 'button',
+                  onClick: () => {
+                    setClosetCoordiSelectedTagId((prev) => (prev === c.id ? null : c.id));
+                  },
+                  className: coordiChipClass(c.variant, closetCoordiSelectedTagId === c.id),
+                },
                 c.label
               )
             )
-          )
+          ),
+          closetCoordiSelectedTagId
+            ? h(
+                'div',
+                { className: 'mt-4 w-full min-w-0' },
+                h(
+                  'div',
+                  {
+                    className:
+                      'flex flex-nowrap gap-3 overflow-x-auto overflow-y-visible pb-2 -mx-1 px-1 ' +
+                      'snap-x snap-mandatory [-webkit-overflow-scrolling:touch] ' +
+                      'scroll-smooth [scrollbar-gutter:stable]',
+                  },
+                  ...CLOSET_COORDI_IDEA_GALLERY.map((item) =>
+                    h(
+                      'div',
+                      {
+                        key: item.id,
+                        className:
+                          'shrink-0 snap-start w-[min(78vw,280px)] min-w-[min(78vw,280px)] ' +
+                          'rounded-2xl overflow-hidden border border-[#ebebeb] bg-black shadow-md',
+                      },
+                      h(
+                        'div',
+                        { className: 'aspect-[4/5] w-full bg-black' },
+                        h('img', {
+                          src: item.image,
+                          alt: '',
+                          className: 'h-full w-full object-cover',
+                          loading: 'lazy',
+                          decoding: 'async',
+                          referrerPolicy: 'no-referrer',
+                        })
+                      ),
+                      h(
+                        'div',
+                        { className: 'bg-black px-3 py-2.5 text-[12px] font-medium leading-snug text-white' },
+                        h('p', { className: 'line-clamp-2' }, item.caption)
+                      )
+                    )
+                  )
+                )
+              )
+            : null
         )
       )
     );
@@ -6961,8 +7170,15 @@ function App() {
                   h('span', { className: 'text-[#111] font-semibold' }, '✨ AI 스타일리스트'),
                   ' 가 이 정보를 기반으로 추천합니다'
                 ),
-                h('button', { onClick: () => setView('FEED'), className: 'bg-slate-900 text-white px-8 py-3 rounded-2xl font-bold text-sm hover:bg-black transition-all shadow-lg flex items-center gap-2' },
-                  h(Sparkles, { size: 16 }), '프로필 저장'
+                h('div', { className: 'flex items-center gap-2' },
+                  h('button', {
+                    type: 'button',
+                    onClick: restartOnboarding,
+                    className: 'rounded-2xl border border-[#d1d5db] bg-white px-4 py-3 text-[13px] font-semibold text-[#374151] transition-colors hover:bg-[#f9fafb]',
+                  }, '취향 재설정하기'),
+                  h('button', { onClick: () => setView('FEED'), className: 'bg-slate-900 text-white px-8 py-3 rounded-2xl font-bold text-sm hover:bg-black transition-all shadow-lg flex items-center gap-2' },
+                    h(Sparkles, { size: 16 }), '프로필 저장'
+                  )
                 )
               )
             ),
