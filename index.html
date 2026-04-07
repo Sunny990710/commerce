@@ -97,7 +97,7 @@ import ReactDOM from 'react-dom/client';
 import {
   Search, Heart, User, Home, Sparkles, ShoppingBag, ChevronLeft, ChevronUp, X, Check, Bell, Mic, Send,
   Image, Camera, ArrowUp, ArrowLeft, CheckCircle2, MapPin, CreditCard, TrendingDown, ArrowRight, ArrowUpRight, Menu, ChevronDown, ChevronRight, Star,
-  ExternalLink, Share2, MoreVertical, Loader2, Settings, LogIn, LogOut, AlertTriangle, Lightbulb, Plus, BarChart3, Youtube,
+  ExternalLink, Share2, MoreVertical, Loader2, Settings, LogOut, AlertTriangle, Lightbulb, Plus, BarChart3, Youtube,
   Truck, RefreshCw, PackageX, Droplets, Sun, Thermometer, Scan
 } from 'lucide-react';
 
@@ -647,8 +647,8 @@ const EXPLORE_STYLE_GUIDE_CHIPS = {
     '꾸안꾸 느낌으로 자연스럽게 예쁜 후드',
   ],
   jay: [
-    '2026 봄 트렌드 반영한 데일리룩 추천해줘.',
-    '이번 시즌 유행하는 아우터 알고 싶어.',
+    '2026 트렌드 반영한 원피스 추천해줘.',
+    '20대 사이에 유행하는 가디건 알고 싶어.',
     '요즘 많이 보이는 자켓 스타일은?',
   ],
   sarah: [
@@ -657,6 +657,11 @@ const EXPLORE_STYLE_GUIDE_CHIPS = {
     '내 체형이면 피해야 하는 셔츠 넥라인이 있을까?',
   ],
 };
+
+/** 대화 탭: 더비 첫 번째 가이드 질문 클릭 시 고정 답변 */
+const EXPLORE_JAY_2026_DRESS_PROMPT = '2026 트렌드 반영한 원피스 추천해줘.';
+const EXPLORE_JAY_2026_DRESS_REPLY =
+  '2026 원피스 트렌드는 빈티지 디테일과 레이어드 감성이 주목받고 있어! 너무 클래식하지 않으면서도 분위기 있게 입기 좋은 빈티지 플로럴 원피스 스타일을 추천해줄게.';
 
 /** 대화 탭: 아래 문구 중 하나와 정확히 일치하면 프레피 룩북 전용 응답(동일 레이아웃) */
 const EXPLORE_PREPPY_LOOKBOOK_PROMPTS = [
@@ -808,7 +813,7 @@ const applyPersonaToExploreMessage = (text, personaId) => {
     case 'ellie':
       return `${text}\n\n취향에 맞게 골라드렸어요. 더 궁금하신 점 있으시면 편하게 말씀해 주세요. 🎁✨`;
     case 'jay':
-      return `자, 이거 봐봐! ${text}\n\n더 세련되게 입고 싶으면 편하게 물어봐! 💥`;
+      return `자, 이거 봐봐! ${text}\n\n20대 사이에 유행하는 가디건이 궁금하면 편하게 물어봐! 💥`;
     case 'sarah':
       return `추천 요약입니다.\n\n${text}\n\n추가 조건이 있으시면 말씀해 주시면 범위를 더 좁혀 드리겠습니다.`;
     default:
@@ -1795,6 +1800,31 @@ function App() {
             },
             { type: 'exploreAssistantText', text: EXPLORE_PREPPY_LOOKBOOK_REPLY_AFTER_LOOKBOOK_3 },
           ],
+        },
+      ]);
+      setIsSearching(false);
+      return;
+    }
+    if (trimmed === EXPLORE_JAY_2026_DRESS_PROMPT && selectedStylistId === 'jay') {
+      const userMessage = { role: 'user', content: input };
+      const newMessages = [...exploreMessages, userMessage];
+      setExploreChatInput('');
+      setSearchShowMoreProducts(false);
+      setRelatedProducts([]);
+      setRelatedLabel('');
+      setIsSearching(true);
+      await new Promise((r) => setTimeout(r, 420));
+      const q = trimmed.toLowerCase();
+      const ids = ['5', '4', '3'];
+      const shown = ids.map((id) => MOCK_PRODUCTS.find((p) => p.id === id)).filter(Boolean);
+      setExploreFilteredProducts(expandChatSearchProductList(shown, 15));
+      setExploreMessages([
+        ...newMessages,
+        {
+          role: 'assistant',
+          content: EXPLORE_JAY_2026_DRESS_REPLY,
+          stylistId: 'jay',
+          blocks: buildExploreRichBlocks(shown, input, q, 'jay'),
         },
       ]);
       setIsSearching(false);
@@ -3136,6 +3166,45 @@ function App() {
     setImageSearchGuideOpen(true);
   };
 
+  /** 검색창 우측 스캔 버튼 + 검은 말풍선(이미지 검색) — 홈·탐색 공통 */
+  const renderImageSearchIconWithTooltip = () =>
+    h('div', { className: 'relative shrink-0' },
+      h(
+        'div',
+        {
+          className:
+            'pointer-events-none absolute bottom-full right-0 z-[130] mb-0.5 flex max-w-[calc(100vw-2rem)] flex-col items-end',
+          style: { width: 'max-content', minWidth: 'max-content' },
+        },
+        h(
+          'div',
+          {
+            id: 'image-search-tooltip-label',
+            className:
+              'block whitespace-nowrap rounded-lg bg-black px-3 py-1.5 text-left text-[12px] font-medium leading-normal text-white shadow-md sm:text-[13px]',
+            role: 'tooltip',
+          },
+          '이미지 검색'
+        ),
+        h('div', {
+          className:
+            'mr-2 h-0 w-0 border-l-[5px] border-r-[5px] border-t-[6px] border-l-transparent border-r-transparent border-t-black',
+        })
+      ),
+      h(
+        'button',
+        {
+          type: 'button',
+          onClick: openImageSearchGuide,
+          className:
+            'shrink-0 flex items-center justify-center rounded-full p-1.5 text-[#888] hover:bg-[#f3f4f6] hover:text-[#111] transition-colors',
+          'aria-label': '이미지로 검색',
+          'aria-describedby': 'image-search-tooltip-label',
+        },
+        h(Scan, { size: 20, strokeWidth: 1.5 })
+      )
+    );
+
   /** 사진 검색 TIP: 동일 이미지에 여유 크롭(좌) vs 타이트 크롭(우) 비교 — assets/pin-03.png */
   const IMAGE_SEARCH_GUIDE_DEMO_IMG = homePinSrc('pin-03.png');
   const renderImageSearchCropDemoColumn = (generous) => {
@@ -3490,10 +3559,10 @@ function App() {
             ? 'max-h-0 opacity-0 pointer-events-none mb-0 py-0 border-0 overflow-hidden'
             : searchOverlayOpen === 'home'
               ? 'max-h-[min(560px,80vh)] opacity-100 mb-3 pt-3 pb-3 sm:pt-4 sm:pb-4 overflow-visible'
-              : 'max-h-[min(560px,80vh)] opacity-100 mb-3 pt-3 pb-3 sm:pt-4 sm:pb-4 overflow-hidden'),
+              : 'max-h-[min(560px,80vh)] opacity-100 mb-3 pt-3 pb-3 sm:pt-4 sm:pb-4 overflow-visible'),
       },
-        h('div', { className: `relative mb-3 sm:mb-4 ${openSearchFilter ? 'z-10' : 'z-40'}`, ref: homeSearchPanelRef },
-        h('div', { className: 'relative z-[1]' },
+        h('div', { className: `relative mb-3 sm:mb-4 overflow-visible ${openSearchFilter ? 'z-10' : 'z-40'}`, ref: homeSearchPanelRef },
+        h('div', { className: 'relative z-[1] overflow-visible' },
           h('div', {
             className: 'flex items-center gap-2 cursor-text',
             onClick: () => setSearchOverlayOpen('home'),
@@ -3511,12 +3580,7 @@ function App() {
                 enterKeyHint: 'search',
                 'aria-label': '검색'
               }),
-              h('button', {
-                type: 'button',
-                onClick: openImageSearchGuide,
-                className: 'shrink-0 flex items-center justify-center rounded-full p-1.5 text-[#888] hover:bg-[#f3f4f6] hover:text-[#111] transition-colors',
-                'aria-label': '이미지로 검색',
-              }, h(Scan, { size: 20, strokeWidth: 1.5 }))
+              renderImageSearchIconWithTooltip()
             )
           ),
           searchOverlayOpen === 'home' ? renderSearchDropdownPanel('home') : null
@@ -4098,7 +4162,12 @@ function App() {
             h('button', { type: 'button', className: 'p-2 rounded-full text-[#bbb] hover:bg-[#f5f5f5] hover:text-[#666] shrink-0', 'aria-label': '첨부' }, h(Image, { size: 20, strokeWidth: 1.5 })),
             h('input', {
               type: 'text',
-              placeholder: '예: 3만 원대 셔츠 추천해 줘',
+              placeholder:
+                selectedStylistId === 'jay'
+                  ? '예: 20대 사이에 유행하는 가디건 알려줘'
+                  : selectedStylistId === 'sarah'
+                    ? '예: 체형에 맞는 바지 추천해 줘'
+                    : '예: 3만 원대 셔츠 추천해 줘',
               className: 'flex-1 min-w-0 bg-transparent outline-none text-[14px] font-normal text-[#111] placeholder:text-[#aaa] py-1.5 px-1',
               value: exploreChatInput,
               onChange: e => setExploreChatInput(e.target.value),
@@ -5281,10 +5350,10 @@ function App() {
           }, h(ChevronLeft, { size: 22, strokeWidth: 1.5 }))
         ),
         h('div', { className: 'flex min-h-0 min-w-0 flex-1 flex-col gap-2 lg:pr-3' },
-          h('div', { className: 'relative w-full min-w-0 z-40', ref: exploreSearchPanelRef },
+          h('div', { className: 'relative w-full min-w-0 z-40 overflow-visible', ref: exploreSearchPanelRef },
             h('div', {
               className:
-                'flex w-full min-w-0 cursor-text items-center gap-2 rounded-full border border-[#e0e0e0] bg-white py-2.5 pl-4 pr-1.5',
+                'flex w-full min-w-0 cursor-text items-center gap-2 overflow-visible rounded-full border border-[#e0e0e0] bg-white py-2.5 pl-4 pr-1.5',
               onClick: () => setSearchOverlayOpen('explore'),
             },
               h(Search, { size: 18, className: 'shrink-0 text-[#bbb]', strokeWidth: 1.5 }),
@@ -5299,12 +5368,7 @@ function App() {
                 enterKeyHint: 'search',
                 'aria-label': '검색',
               }),
-              h('button', {
-                type: 'button',
-                onClick: openImageSearchGuide,
-                className: 'shrink-0 flex items-center justify-center rounded-full p-1.5 text-[#888] hover:bg-[#f3f4f6] hover:text-[#111] transition-colors',
-                'aria-label': '이미지로 검색',
-              }, h(Scan, { size: 20, strokeWidth: 1.5 }))
+              renderImageSearchIconWithTooltip()
             ),
             searchOverlayOpen === 'explore' ? renderSearchDropdownPanel('explore') : null
           ),
@@ -6753,10 +6817,7 @@ function App() {
                   }, h(LogOut, { size: 15 }), '로그아웃')
                 ) : null
               )
-            : h('button', {
-                onClick: () => openAuthModal('LOGIN'),
-                className: 'px-5 py-2 bg-[#111] text-white text-[13px] font-medium rounded-md hover:bg-[#333] transition-colors flex items-center gap-2'
-              }, h(LogIn, { size: 15, strokeWidth: 1.5 }), '로그인')
+            : null
         ),
         view === 'HOME' ? renderHome() : null,
         view === 'SEARCH' ? renderSearch() : null,
