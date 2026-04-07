@@ -647,7 +647,7 @@ const EXPLORE_STYLE_GUIDE_CHIPS = {
     '꾸안꾸 느낌으로 자연스럽게 예쁜 후드',
   ],
   jay: [
-    '2026 트렌드 반영한 원피스 추천해줘.',
+    '2026 패션 트렌드 반영한 원피스 추천해줘.',
     '20대 사이에 유행하는 가디건 알고 싶어.',
     '요즘 많이 보이는 자켓 스타일은?',
   ],
@@ -659,9 +659,12 @@ const EXPLORE_STYLE_GUIDE_CHIPS = {
 };
 
 /** 대화 탭: 더비 첫 번째 가이드 질문 클릭 시 고정 답변 */
-const EXPLORE_JAY_2026_DRESS_PROMPT = '2026 트렌드 반영한 원피스 추천해줘.';
+const EXPLORE_JAY_2026_DRESS_PROMPT = '2026 패션 트렌드 반영한 원피스 추천해줘.';
 const EXPLORE_JAY_2026_DRESS_REPLY =
-  '2026 원피스 트렌드는 빈티지 디테일과 레이어드 감성이 주목받고 있어! 너무 클래식하지 않으면서도 분위기 있게 입기 좋은 빈티지 플로럴 원피스 스타일을 추천해줄게.';
+  '2026 원피스 트렌드는 빈티지 디테일과 레이어드 감성이 주목받고 있어! 너무 클래식하지 않으면서도 분위기 있게 입기 좋은 빈티지 플로럴 원피스 스타일을 추천해줄게.\n\n' +
+  '📌 **플브 슬리브리스 롱 원피스:** 편하면서도 데일리하게 입기 쉬운 원피스예요. 가디건이나 얇은 재킷이랑 겹쳐 입으면 레이어드 느낌이 자연스럽게 살아나서, 출근룩이나 데이트룩으로 활용도가 높아요.\n' +
+  '📌 **플로럴 러플 디테일 원피스:** 실루엣과 디테일이 조금 더 여성스럽고 정돈된 느낌이라, 단순히 빈티지한 것보다 “조금 더 감도 있고 갖춰 입은 느낌”을 원할 때 추천하기 좋아요.\n' +
+  '📌 **로데 플로럴 원피스:** 너무 과하지 않으면서도 분위기를 확실히 만들어주는 쪽이라, 감도 있게 입고 싶을 때 잘 맞아요.';
 
 /** 대화 탭: 아래 문구 중 하나와 정확히 일치하면 프레피 룩북 전용 응답(동일 레이아웃) */
 const EXPLORE_PREPPY_LOOKBOOK_PROMPTS = [
@@ -782,7 +785,7 @@ const STYLE_STYLISTS = [
     name: '더비',
     tags: ['트렌드세터', '세련', '센스'],
     intro:
-      '평범한 스타일 말고, 더 세련된 아이템을 찾고 있어? 분위기 살리고 센스까지 챙기는 코디, 내가 제대로 알려줄게. 💥',
+      '평범한 스타일 말고, 더 세련된 아이템을 찾고 있어? 분위기 살리고 센스까지 챙기는 패션 아이템, 내가 제대로 알려줄게. 💥',
     greeting:
       '안녕! 트렌드세터 더비야 💥 평범한 코디 말고 센스 있는 거 찾는 거면, 나한테 바로 말해!',
     tonePrompt:
@@ -1694,7 +1697,7 @@ function App() {
 
   // ── Profile state ──
   const [profile, setProfile] = useState({
-    gender: '', height: '', age: '', brands: [], style: [],
+    height: '', age: '', brands: [], style: [],
     bodyType: '', personalColor: '', upperConcern: [], lowerConcern: [],
     budgetMin: '', budgetMax: '', budgetFlex: '',
   });
@@ -3836,7 +3839,7 @@ function App() {
               ),
               h(
                 'div',
-                { className: 'flex w-full justify-center overflow-hidden rounded-2xl border-2 border-rose-400/90 bg-white shadow-sm' },
+                { className: 'relative flex w-full justify-center overflow-hidden rounded-2xl border-2 border-rose-400/90 bg-white shadow-sm' },
                 h('img', {
                   src: block.lookbookImage,
                   alt: '',
@@ -3846,7 +3849,16 @@ function App() {
                   loading: 'lazy',
                   decoding: 'async',
                   referrerPolicy: 'no-referrer',
-                })
+                }),
+                h(
+                  'span',
+                  {
+                    className:
+                      'pointer-events-none absolute bottom-2 right-2 z-[1] rounded-md bg-white/95 px-2 py-0.5 text-[10px] font-semibold tracking-tight text-rose-600 shadow-sm ring-1 ring-rose-200/80 backdrop-blur-[2px]',
+                    'aria-hidden': true,
+                  },
+                  '입어보기'
+                )
               ),
               block.lookbookCaption
                 ? h(
@@ -6873,7 +6885,7 @@ function App() {
           return h('div', { className: 'pb-4 lg:pb-24 animate-fadeIn max-w-2xl mx-auto px-0 sm:px-2' },
             // Header
             h('div', { className: 'flex items-center gap-4 mb-8' },
-              h('div', { className: 'w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center text-white text-2xl font-black' }, profile.gender === '남성' ? '👨' : profile.gender === '여성' ? '👩' : '👤'),
+              h('div', { className: 'w-16 h-16 bg-black rounded-full flex items-center justify-center text-white text-3xl leading-none shadow-md', 'aria-hidden': true }, '👩'),
               h('div', null,
                 h('h2', { className: 'text-2xl font-black text-slate-900' }, '내 스타일 프로필'),
                 h('p', { className: 'text-slate-400 text-sm font-medium' }, 'AI가 더 정확하게 추천할 수 있도록 알려주세요')
@@ -6882,11 +6894,6 @@ function App() {
             h('div', { className: 'bg-white rounded-3xl border border-slate-200 p-8 shadow-sm' },
               // 기본 정보
               Section({ title: '기본 정보', children: h('div', { className: 'space-y-3' },
-                // 성별
-                h('div', { className: 'flex gap-2' },
-                  ...['여성', '남성'].map(g => Chip({ label: g, selected: profile.gender === g, onClick: () => updateProfile('gender', g) }))
-                ),
-                // 키/나이
                 h('div', { className: 'flex gap-3' },
                   InputField({ placeholder: '키', value: profile.height, onChange: v => updateProfile('height', v), unit: 'cm', half: true }),
                   InputField({ placeholder: '나이', value: profile.age, onChange: v => updateProfile('age', v), unit: '세', half: true })
@@ -6961,14 +6968,13 @@ function App() {
             ),
 
             // Preview summary
-            (profile.gender || profile.brands.length || profile.style.length) ? h('div', { className: 'mt-6 bg-[#fafafa] rounded-2xl p-6 border border-[#ebebeb]' },
+            (profile.age || profile.height || profile.brands.length || profile.style.length || profile.bodyType || profile.personalColor || profile.upperConcern.length || profile.lowerConcern.length || profile.budgetMin || profile.budgetMax || profile.budgetFlex) ? h('div', { className: 'mt-6 bg-[#fafafa] rounded-2xl p-6 border border-[#ebebeb]' },
               h('div', { className: 'flex items-center gap-2 mb-3' },
                 h(Sparkles, { size: 14, className: 'text-[#111]', strokeWidth: 1.5 }),
                 h('h4', { className: 'text-xs font-semibold text-[#111]' }, 'AI가 이해한 내 스타일')
               ),
               h('p', { className: 'text-[12px] text-[#555] leading-relaxed' },
                 [
-                  profile.gender && `${profile.gender}`,
                   profile.age && `${profile.age}세`,
                   profile.height && `${profile.height}cm`,
                   profile.bodyType,
