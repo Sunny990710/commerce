@@ -697,7 +697,7 @@ const HOME_EXPLORE_REVIEW_ROWS = [
 const EXPLORE_STYLE_GUIDE_CHIPS = {
   ellie: [
     '클래식하면서도 위트 있는 프레피룩 좋아하는데, 개강때 입을만한 니트 코디 추천해줘.',
-    '카페나 전시회처럼 편하게 돌아다니는 일정에 잘 어울리는 차분하고 여성스러운 무드의 데이트룩 추천해줘.',
+    '카페나 전시회처럼 편하게 돌아다니는 일정에 잘 어울리는 여성스러운 무드의 데이트룩 추천해줘.',
     '집 앞에 영화관 걸 때 꾸안꾸 느낌으로 자연스럽게 예쁜 후드 코디 추천해줘.',
   ],
   jay: [
@@ -731,9 +731,9 @@ const EXPLORE_SARAH_BRAND_REPLY =
 /** 대화 탭: 아래 문구 중 하나와 정확히 일치하면 프레피 룩북 전용 응답(동일 레이아웃) */
 const EXPLORE_PREPPY_LOOKBOOK_PROMPTS = [
   '클래식하면서도 위트 있는 프레피룩 좋아하는데, 개강때 입을만한 니트 코디 추천해줘.',
-  '카페나 전시회처럼 편하게 돌아다니는 일정에 잘 어울리는 차분하고 여성스러운 무드의 데이트룩 추천해줘.',
+  '카페나 전시회처럼 편하게 돌아다니는 일정에 잘 어울리는 여성스러운 무드의 데이트룩 추천해줘.',
   '집 앞에 영화관 걸 때 꾸안꾸 느낌으로 자연스럽게 예쁜 후드 코디 추천해줘.',
-  '카페나 전시회처럼 편하게 돌아다니는 일정에 잘 어울리는 차분하고 여성스러운 무드의 데이트룩 추천해줘. 집 앞에 영화관 걸 때 꾸안꾸 느낌으로 자연스럽게 예쁜 후드 코디 추천해줘. 클래식하면서도 위트 있는 프레피룩 좋아하는데, 개강때 입을만한 니트 코디 추천해줘.',
+  '카페나 전시회처럼 편하게 돌아다니는 일정에 잘 어울리는 여성스러운 무드의 데이트룩 추천해줘. 집 앞에 영화관 걸 때 꾸안꾸 느낌으로 자연스럽게 예쁜 후드 코디 추천해줘. 클래식하면서도 위트 있는 프레피룩 좋아하는데, 개강때 입을만한 니트 코디 추천해줘.',
 ];
 /** 프레피 룩북: 도입(룩북 UI 위) */
 const EXPLORE_PREPPY_LOOKBOOK_REPLY_INTRO =
@@ -835,6 +835,12 @@ const STYLE_STYLISTS = [
     tags: ['코디네이터', '취향 맞춤', '분위기'],
     intro:
       '어떤 옷을 골라야 할지 고민되시나요? 당신의 취향과 분위기에 맞는 아이템을 함께 찾아드릴게요. 🎁✨',
+    /** 페르소나 선택 화면: 예시 질문 (모바일 가로 칩 = title / subtitle) */
+    pickerExampleQuestions: [
+      { title: '국현미 전시회', subtitle: '갈 때 입기 좋은 캐주얼룩' },
+      { title: '꾸안꾸 스타일', subtitle: '집앞 데이트룩' },
+      { title: '내 옷과 매치', subtitle: '잘 어울리는 아이템 추천' },
+    ],
     greeting:
       '안녕하세요, 코디네이터 엘리예요. 🎁✨ 취향이나 분위기를 편하게 알려주시면, 함께 어울리는 아이템을 찾아볼게요.',
     tonePrompt:
@@ -848,6 +854,11 @@ const STYLE_STYLISTS = [
     tags: ['트렌드세터', '세련', '센스'],
     intro:
       '평범한 스타일 말고, 요즘 핫한 무드의 아이템을 찾고 있어? 셀럽 착장처럼 눈에 띄는 룩부터 비슷한 아이템까지 센스 있게 찾아줄게. 💥',
+    pickerExampleQuestions: [
+      { title: '화사 청룡 착장', subtitle: '굿굿바이 때 입은 드레스' },
+      { title: '요즘 유행 아이템', subtitle: '트렌디한 자켓 찾아줘' },
+      { title: '제니 자크뮈스', subtitle: '검은 드레스 찾아줘' },
+    ],
     greeting:
       '안녕! 트렌드세터 더비야 💥 연예인 착장, 무대룩, 드라마 속 스타일처럼 눈에 들어온 룩이 있다면 말해줘. 비슷한 무드의 아이템이나 현실적으로 입기 좋은 스타일로 바로 찾아줄게!',
     tonePrompt:
@@ -861,6 +872,11 @@ const STYLE_STYLISTS = [
     tags: ['정밀 컨설턴트', '정확', '실패 없는'],
     intro:
       '감성보다 정확한 스타일 조언이 필요하신가요? 실패 없는 스타일을 정확하게 추천해드릴게요.🕶️',
+    pickerExampleQuestions: [
+      { title: '내 취향 브랜드', subtitle: '미세키서울 무드 브랜드' },
+      { title: '핏/체형 고민', subtitle: '굵은 다리 커버 바지 추천' },
+      { title: '퍼스널컬러', subtitle: '여름 쿨톤 셔츠 추천' },
+    ],
     greeting:
       '안녕하세요, 정밀 컨설턴트 스캇입니다. 조건을 구체적으로 알려주시면, 기준에 맞는 스타일만 짚어 드리겠습니다. 🕶️',
     tonePrompt:
@@ -870,6 +886,14 @@ const STYLE_STYLISTS = [
   },
 ];
 const getStylistById = (id) => STYLE_STYLISTS.find((s) => s.id === id) || STYLE_STYLISTS[0];
+
+/** 페르소나 예시 질문: 문자열 또는 { title, subtitle } */
+const getPickerExampleChipParts = (item) => {
+  if (item && typeof item === 'object' && item.title != null) {
+    return { title: String(item.title), subtitle: item.subtitle != null ? String(item.subtitle) : '' };
+  }
+  return { title: String(item ?? ''), subtitle: '' };
+};
 
 /** API/폴백 응답 문구에 페르소나 톤 적용 */
 const applyPersonaToExploreMessage = (text, personaId) => {
@@ -1451,7 +1475,6 @@ function App() {
   const [homeExploreMoodBrand, setHomeExploreMoodBrand] = useState(null);
   /** 홈 메인 피드 상단 검색 (오버레이와 별도, 닫을 때 유지) */
   const [homeFeedSearchQuery, setHomeFeedSearchQuery] = useState('');
-  const [closetFeedSearchQuery, setClosetFeedSearchQuery] = useState('');
   const [closetRankingTab, setClosetRankingTab] = useState('followers');
   const [closetRankExpanded, setClosetRankExpanded] = useState(false);
   const [closetInsightTab, setClosetInsightTab] = useState('rec');
@@ -1468,7 +1491,7 @@ function App() {
   const [closetFashionistaProfileFollow, setClosetFashionistaProfileFollow] = useState({});
   /** 옷장: 선택된 무드 태그 id — 값이 있으면 코디 아이디어 가로 갤러리 표시 */
   const [closetCoordiSelectedTagId, setClosetCoordiSelectedTagId] = useState(null);
-  /** null | 'home' | 'explore' | 'closet' — 검색 제안 드롭다운 */
+  /** null | 'home' | 'explore' — 검색 제안 드롭다운 */
   const [searchOverlayOpen, setSearchOverlayOpen] = useState(null);
   const [detailTab, setDetailTab] = useState('REVIEW');
   const [detailSubTab, setDetailSubTab] = useState('COMPARE');
@@ -1476,9 +1499,11 @@ function App() {
   const [benefitChecks, setBenefitChecks] = useState({});
   const [chatInput, setChatInput] = useState('');
   const [exploreChatInput, setExploreChatInput] = useState('');
-  const [exploreMessages, setExploreMessages] = useState([
-    { role: 'assistant', content: STYLE_STYLISTS[0].greeting, stylistId: 'ellie' }
-  ]);
+  const [exploreMessages, setExploreMessages] = useState([]);
+  /** 대화 탭: 카드에서 페르소나를 고른 뒤에만 채팅 UI 표시 */
+  const [explorePersonaChosen, setExplorePersonaChosen] = useState(false);
+  /** 대화 탭 페르소나 선택 캐러셀 중앙 인덱스 */
+  const [explorePersonaPickerIndex, setExplorePersonaPickerIndex] = useState(0);
   const [exploreFilteredProducts, setExploreFilteredProducts] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [relatedLabel, setRelatedLabel] = useState('');
@@ -1607,12 +1632,161 @@ function App() {
   /** 맨 위로 버튼: 상단 근처에서만 숨김(히스테리시스로 경계에서 깜빡임 완화) */
   const homeScrollTopLatchRef = useRef(false);
   const chatEndRef = useRef(null);
+  /** 대화 탭: 스타일리스트 아바타 길게 누르기 → 페르소나 변경 화면 */
+  const stylistAvatarLongPressTimerRef = useRef(null);
+  const clearStylistAvatarLongPress = () => {
+    const t = stylistAvatarLongPressTimerRef.current;
+    if (t != null) {
+      clearTimeout(t);
+      stylistAvatarLongPressTimerRef.current = null;
+    }
+  };
+  useEffect(() => () => clearStylistAvatarLongPress(), []);
+  const STYLIST_AVATAR_LONG_PRESS_MS = 520;
+  const scheduleOpenStylistPersonaFromAvatar = (stylistId) => {
+    clearStylistAvatarLongPress();
+    stylistAvatarLongPressTimerRef.current = window.setTimeout(() => {
+      stylistAvatarLongPressTimerRef.current = null;
+      const idx = STYLE_STYLISTS.findIndex((s) => s.id === stylistId);
+      setPersonaCarouselIndex(idx >= 0 ? idx : 0);
+      setStylePersonaScreenOpen(true);
+      try {
+        if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(12);
+      } catch (_) {}
+    }, STYLIST_AVATAR_LONG_PRESS_MS);
+  };
+  /** 페르소나 선택 화면: 예시 질문 가로 드래그 스크롤 */
+  const PICKER_DRAG_SENSITIVITY = 0.62;
+  const PICKER_DRAG_LERP = 0.24;
+  const pickerExampleDragRef = useRef({
+    active: false,
+    startX: 0,
+    startLeft: 0,
+    targetLeft: 0,
+    rafId: 0,
+    el: null,
+    cleanup: null,
+  });
+  const animatePickerExampleDrag = () => {
+    const st = pickerExampleDragRef.current;
+    const el = st.el;
+    if (!el) {
+      st.rafId = 0;
+      return;
+    }
+    const diff = st.targetLeft - el.scrollLeft;
+    if (Math.abs(diff) < 0.5) {
+      el.scrollLeft = st.targetLeft;
+      st.rafId = 0;
+      return;
+    }
+    el.scrollLeft += diff * PICKER_DRAG_LERP;
+    st.rafId = window.requestAnimationFrame(animatePickerExampleDrag);
+  };
+  const startPickerExampleDrag = (el, pageX) => {
+    if (!el) return;
+    const st = pickerExampleDragRef.current;
+    st.active = true;
+    st.startX = pageX;
+    st.startLeft = el.scrollLeft;
+    st.targetLeft = el.scrollLeft;
+    st.el = el;
+    if (st.rafId) {
+      window.cancelAnimationFrame(st.rafId);
+      st.rafId = 0;
+    }
+    try { el.style.cursor = 'grabbing'; } catch (_) {}
+  };
+  const movePickerExampleDrag = (el, pageX) => {
+    const st = pickerExampleDragRef.current;
+    if (!st.active || !el) return;
+    const dx = pageX - st.startX;
+    const maxLeft = Math.max(0, el.scrollWidth - el.clientWidth);
+    const next = st.startLeft - dx * PICKER_DRAG_SENSITIVITY;
+    st.targetLeft = Math.max(0, Math.min(maxLeft, next));
+    st.el = el;
+    if (!st.rafId) st.rafId = window.requestAnimationFrame(animatePickerExampleDrag);
+  };
+  const endPickerExampleDrag = (el) => {
+    const st = pickerExampleDragRef.current;
+    st.active = false;
+    if (st.cleanup) {
+      st.cleanup();
+      st.cleanup = null;
+    }
+    try { document.body.style.userSelect = ''; } catch (_) {}
+    try { if (el) el.style.cursor = 'grab'; } catch (_) {}
+  };
+  const bindPickerExampleGlobalDrag = () => {
+    const onMove = (evt) => {
+      const st = pickerExampleDragRef.current;
+      const el = st.el;
+      if (!st.active || !el) return;
+      evt.preventDefault();
+      movePickerExampleDrag(el, evt.pageX);
+    };
+    const onUp = () => {
+      const st = pickerExampleDragRef.current;
+      endPickerExampleDrag(st.el);
+    };
+    window.addEventListener('pointermove', onMove, { passive: false });
+    window.addEventListener('pointerup', onUp, { passive: true });
+    window.addEventListener('pointercancel', onUp, { passive: true });
+    pickerExampleDragRef.current.cleanup = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+  };
+  const onPickerExamplePointerDown = (e) => {
+    const el = e.currentTarget;
+    if (!el) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    e.preventDefault();
+    try { el.setPointerCapture(e.pointerId); } catch (_) {}
+    try { document.body.style.userSelect = 'none'; } catch (_) {}
+    startPickerExampleDrag(el, e.pageX);
+    bindPickerExampleGlobalDrag();
+  };
+  const onPickerExamplePointerUp = (e) => {
+    const el = e.currentTarget;
+    endPickerExampleDrag(el);
+    try { el?.releasePointerCapture(e.pointerId); } catch (_) {}
+  };
+  const onPickerExamplePointerCancel = (e) => {
+    const el = e.currentTarget;
+    endPickerExampleDrag(el);
+    try { el?.releasePointerCapture(e.pointerId); } catch (_) {}
+  };
+  const onPickerExampleMouseDown = (e) => {
+    if (e.button !== 0) return;
+    const el = e.currentTarget;
+    if (!el) return;
+    e.preventDefault();
+    try { document.body.style.userSelect = 'none'; } catch (_) {}
+    startPickerExampleDrag(el, e.pageX);
+    const onMove = (evt) => {
+      evt.preventDefault();
+      movePickerExampleDrag(el, evt.pageX);
+    };
+    const onUp = () => endPickerExampleDrag(el);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp, { once: true });
+    pickerExampleDragRef.current.cleanup = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+  };
+  useEffect(() => () => {
+    const st = pickerExampleDragRef.current;
+    if (st.cleanup) st.cleanup();
+    if (st.rafId) window.cancelAnimationFrame(st.rafId);
+  }, []);
   const userMenuRef = useRef(null);
   const searchFilterRef = useRef(null);
   const homeFilterRef = useRef(null);
   const homeSearchPanelRef = useRef(null);
   const exploreSearchPanelRef = useRef(null);
-  const closetSearchPanelRef = useRef(null);
   const imageSearchGalleryInputRef = useRef(null);
   const imageSearchCameraInputRef = useRef(null);
   /** 검색창 스캔 아이콘: 사진 검색 가이드 오버레이 */
@@ -1747,8 +1921,7 @@ function App() {
 
   useEffect(() => {
     if (view !== 'HOME' && view !== 'FEED') setSearchOverlayOpen(null);
-    else if (view === 'HOME' && searchOverlayOpen === 'closet') setSearchOverlayOpen(null);
-    else if (view === 'FEED' && searchOverlayOpen && searchOverlayOpen !== 'closet') setSearchOverlayOpen(null);
+    else if (view === 'FEED' && searchOverlayOpen) setSearchOverlayOpen(null);
   }, [view, searchOverlayOpen]);
 
   useEffect(() => {
@@ -1819,9 +1992,6 @@ function App() {
         setSearchOverlayOpen(null);
       }
       if (searchOverlayOpen === 'explore' && exploreSearchPanelRef.current && !exploreSearchPanelRef.current.contains(t)) {
-        setSearchOverlayOpen(null);
-      }
-      if (searchOverlayOpen === 'closet' && closetSearchPanelRef.current && !closetSearchPanelRef.current.contains(t)) {
         setSearchOverlayOpen(null);
       }
     };
@@ -1950,6 +2120,7 @@ function App() {
 
   const handleExploreSearch = async (input) => {
     if (!input.trim() || isSearching) return;
+    setExplorePersonaChosen(true);
     const trimmed = input.trim();
     if (EXPLORE_PREPPY_LOOKBOOK_PROMPTS.includes(trimmed)) {
       const userMessage = { role: 'user', content: input };
@@ -3396,8 +3567,7 @@ function App() {
   const closeSearchOverlay = () => setSearchOverlayOpen(null);
   const renderSearchDropdownPanel = (context) => {
     if (searchOverlayOpen !== context) return null;
-    const setQ =
-      context === 'home' ? setHomeFeedSearchQuery : context === 'closet' ? setClosetFeedSearchQuery : setHomeExploreQuery;
+    const setQ = context === 'home' ? setHomeFeedSearchQuery : setHomeExploreQuery;
     const selectTerm = (term) => {
       setQ(term);
       closeSearchOverlay();
@@ -4499,6 +4669,201 @@ function App() {
 
   // ── SEARCH ──
   const renderSearch = () => {
+    if (!explorePersonaChosen) {
+      const nPick = STYLE_STYLISTS.length;
+      const pickIdx = explorePersonaPickerIndex;
+      const pickPrev = (pickIdx - 1 + nPick) % nPick;
+      const pickNext = (pickIdx + 1) % nPick;
+      const pickCur = STYLE_STYLISTS[pickIdx];
+      const startWithPickCur = () => {
+        setSelectedStylistId(pickCur.id);
+        setExploreMessages([{ role: 'assistant', content: pickCur.greeting, stylistId: pickCur.id }]);
+        setExploreFilteredProducts([]);
+        setRelatedProducts([]);
+        setRelatedLabel('');
+        setSearchShowMoreProducts(false);
+        setExploreChatInput('');
+        setExplorePersonaChosen(true);
+      };
+      return h(
+        'div',
+        {
+          className:
+            'relative animate-fadeIn flex flex-col w-full max-w-lg mx-auto h-[calc(100dvh-7.5rem)] lg:h-[calc(100vh-8rem)] max-h-[calc(100dvh-5rem)] min-h-0',
+        },
+        h(
+          'div',
+          {
+            className: 'flex-1 min-h-0 overflow-y-auto px-5 sm:px-8 pt-2 sm:pt-4 pb-4 [scrollbar-gutter:stable]',
+          },
+          h('p', { className: 'text-center text-[13px] font-medium text-[#888] tracking-wide' }, 'AI 스타일리스트'),
+          h('h2', { className: 'mt-1 text-center text-xl sm:text-2xl font-bold text-[#111] tracking-tight' }, '대화 상대를 선택해 주세요'),
+          h(
+            'div',
+            { className: 'relative mt-5 sm:mt-6 flex min-h-[180px] items-end justify-center py-2' },
+            h('button', {
+              type: 'button',
+              onClick: () => setExplorePersonaPickerIndex((i) => (i - 1 + nPick) % nPick),
+              className:
+                'absolute left-0 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-transparent text-[#555] transition-opacity hover:opacity-70 active:opacity-50',
+              'aria-label': '이전 페르소나',
+            }, h(ChevronLeft, { size: 22, strokeWidth: 1.75 })),
+            h('button', {
+              type: 'button',
+              onClick: () => setExplorePersonaPickerIndex((i) => (i + 1) % nPick),
+              className:
+                'absolute right-0 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-transparent text-[#555] transition-opacity hover:opacity-70 active:opacity-50',
+              'aria-label': '다음 페르소나',
+            }, h(ChevronRight, { size: 22, strokeWidth: 1.75 })),
+            h(
+              'div',
+              { className: 'flex items-end justify-center gap-3 px-11 sm:gap-5 sm:px-14' },
+              h(
+                'button',
+                {
+                  type: 'button',
+                  onClick: () => setExplorePersonaPickerIndex(pickPrev),
+                  className:
+                    'flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-2xl border border-[#ebebeb] bg-white opacity-55 shadow-sm transition-all hover:opacity-90 sm:h-20 sm:w-20',
+                  'aria-label': STYLE_STYLISTS[pickPrev].name + ' 보기',
+                },
+                h(
+                  'span',
+                  {
+                    className:
+                      'flex h-full w-full items-center justify-center rounded-xl text-3xl sm:text-4xl ' +
+                      STYLE_STYLISTS[pickPrev].avatarClass,
+                  },
+                  STYLE_STYLISTS[pickPrev].emoji
+                )
+              ),
+              h(
+                'div',
+                {
+                  className:
+                    'flex h-[136px] w-[136px] shrink-0 items-center justify-center rounded-2xl border-2 border-[#111] bg-white shadow-[0_8px_28px_rgba(0,0,0,0.12)] sm:h-40 sm:w-40',
+                  'aria-hidden': true,
+                },
+                h(
+                  'span',
+                  {
+                    className:
+                      'flex h-full w-full items-center justify-center rounded-xl text-5xl sm:text-6xl ' + pickCur.avatarClass,
+                  },
+                  pickCur.emoji
+                )
+              ),
+              h(
+                'button',
+                {
+                  type: 'button',
+                  onClick: () => setExplorePersonaPickerIndex(pickNext),
+                  className:
+                    'flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-2xl border border-[#ebebeb] bg-white opacity-55 shadow-sm transition-all hover:opacity-90 sm:h-20 sm:w-20',
+                  'aria-label': STYLE_STYLISTS[pickNext].name + ' 보기',
+                },
+                h(
+                  'span',
+                  {
+                    className:
+                      'flex h-full w-full items-center justify-center rounded-xl text-3xl sm:text-4xl ' +
+                      STYLE_STYLISTS[pickNext].avatarClass,
+                  },
+                  STYLE_STYLISTS[pickNext].emoji
+                )
+              )
+            )
+          ),
+          h('h3', { className: 'mt-6 sm:mt-7 text-center text-2xl font-bold text-[#111] sm:text-[26px]' }, pickCur.name),
+          h(
+            'div',
+            { className: 'mt-3 flex flex-wrap justify-center gap-2 px-1' },
+            ...pickCur.tags.map((tag, ti) =>
+              h(
+                'span',
+                {
+                  key: 'pick-tag-' + pickCur.id + '-' + ti,
+                  className: 'rounded-full border border-[#ddd] bg-white px-3 py-1.5 text-[12px] sm:text-[13px] font-medium text-[#111]',
+                },
+                tag
+              )
+            )
+          ),
+          h(
+            'p',
+            { className: 'mx-auto mt-5 max-w-md text-center text-[14px] leading-relaxed text-[#555] sm:text-[15px]' },
+            pickCur.intro
+          ),
+          pickCur.pickerExampleQuestions && pickCur.pickerExampleQuestions.length
+            ? h(
+                'div',
+                { className: 'mx-auto mt-4 w-full max-w-md' },
+                h(
+                  'div',
+                  {
+                    className:
+                      '-mr-5 overflow-x-auto overflow-y-visible pb-1.5 no-scrollbar snap-x snap-mandatory sm:-mr-8 cursor-grab active:cursor-grabbing',
+                    onMouseDown: onPickerExampleMouseDown,
+                    onPointerDown: onPickerExamplePointerDown,
+                    onPointerUp: onPickerExamplePointerUp,
+                    onPointerCancel: onPickerExamplePointerCancel,
+                    onPointerEnter: (e) => {
+                      try { e.currentTarget.style.cursor = 'grab'; } catch (_) {}
+                    },
+                  },
+                  h(
+                    'div',
+                    {
+                      className:
+                        'flex w-max gap-2 pr-5 sm:pr-8 sm:gap-2.5',
+                    },
+                    ...pickCur.pickerExampleQuestions.map((raw, qi) => {
+                      const { title, subtitle } = getPickerExampleChipParts(raw);
+                      return h(
+                        'div',
+                        {
+                          key: 'pick-ex-' + pickCur.id + '-' + qi,
+                          role: 'note',
+                          className:
+                            'flex w-[136px] shrink-0 snap-start flex-col rounded-2xl border border-[#e8e9ec] bg-[#f4f5f7] px-2 py-2 text-left shadow-sm min-w-0 sm:w-[128px] md:w-[140px]',
+                        },
+                        h('p', { className: 'w-full min-w-0 break-words text-[11px] font-bold leading-snug text-[#111] sm:text-[12px] md:text-[13px]' }, title),
+                        subtitle
+                          ? h('p', { className: 'mt-0.5 w-full min-w-0 break-words text-[9px] leading-snug text-[#888] sm:text-[10px] sm:text-gray-600 md:text-[11px]' }, subtitle)
+                          : null
+                      );
+                    })
+                  )
+                )
+              )
+            : null
+        ),
+        h(
+          'div',
+          {
+            className:
+              'shrink-0 bg-[#fafafa]/95 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-sm',
+          },
+          h(
+            'p',
+            {
+              className: 'mb-2.5 text-center text-[11px] sm:text-[12px] font-normal leading-snug text-[#9ca3af]',
+            },
+            '언제든 대화 중에 스타일리스트를 변경할 수 있어요.'
+          ),
+          h(
+            'button',
+            {
+              type: 'button',
+              onClick: startWithPickCur,
+              className:
+                'w-full rounded-2xl bg-[#111] py-3.5 text-[15px] font-bold text-white shadow-sm transition-colors hover:bg-[#333] active:scale-[0.99]',
+            },
+            '이 스타일리스트로 시작'
+          )
+        )
+      );
+    }
     const filteredExploreProducts = exploreFilteredProducts.filter(matchesSearchFilters);
     const filteredRelatedProducts = relatedProducts.filter(matchesSearchFilters);
 
@@ -4885,11 +5250,22 @@ function App() {
             msg.role === 'user'
               ? h('div', { className: 'bg-[#f0f0f0] text-[#111] px-3.5 py-2.5 rounded-2xl rounded-tr-md text-[13px] leading-relaxed font-normal max-w-[min(92%,420px)] border border-[#e8e8e8] shadow-sm' }, msg.content)
               : h('div', { className: 'flex gap-2 max-w-[min(100%,600px)] w-full min-w-0' },
-                  h('div', {
+                  h('button', {
+                    type: 'button',
                     className:
-                      'w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm border border-white/90 text-lg sm:text-xl ' +
-                      (msgStylist?.avatarClass || 'bg-gradient-to-br from-[#ffe0ea] to-[#ffc2d4]'),
-                    'aria-hidden': true,
+                      'w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm border border-white/90 text-lg sm:text-xl touch-manipulation select-none p-0 ' +
+                      (msgStylist?.avatarClass || 'bg-gradient-to-br from-[#ffe0ea] to-[#ffc2d4]') +
+                      ' focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111]/20 focus-visible:ring-offset-2',
+                    'aria-label': (msgStylist?.name || 'AI 스타일리스트') + ', 길게 눌러 변경',
+                    onPointerDown: (e) => {
+                      if (e.pointerType === 'mouse' && e.button !== 0) return;
+                      scheduleOpenStylistPersonaFromAvatar(guideSid);
+                    },
+                    onPointerUp: clearStylistAvatarLongPress,
+                    onPointerCancel: clearStylistAvatarLongPress,
+                    onPointerLeave: clearStylistAvatarLongPress,
+                    onLostPointerCapture: clearStylistAvatarLongPress,
+                    onContextMenu: (e) => e.preventDefault(),
                   }, msgStylist?.emoji || '✨'),
                   h('div', { className: 'flex flex-1 flex-col gap-0 min-w-0' },
                     h('div', { className: 'rounded-2xl rounded-tl-md border border-[#ebebeb] bg-white px-3 py-2.5 shadow-sm' },
@@ -4900,18 +5276,32 @@ function App() {
                       embedHere ? renderSearchProductEmbed() : null
                     ),
                     showExploreGuideChips
-                      ? h('nav', { className: 'mt-3 flex w-full min-w-0 flex-col gap-4 pl-0', 'aria-label': '추천 질문' },
-                          ...guideList.map((prompt, gi) =>
-                            h('button', {
-                              key: 'explore-guide-' + guideSid + '-' + gi,
-                              type: 'button',
-                              disabled: isSearching,
-                              onClick: () => void handleExploreSearch(prompt),
-                              className:
-                                'group flex w-full items-start gap-2 rounded-md border-0 bg-transparent p-0 text-left transition-opacity hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111]/15 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40',
-                            },
-                              h(ChevronRight, { size: 16, className: 'mt-0.5 shrink-0 text-[#c4c4c4]', strokeWidth: 1.75 }),
-                              h('span', { className: 'text-[13px] font-normal leading-snug text-[#333] group-hover:text-[#111]' }, prompt)
+                      ? h('nav', {
+                          className:
+                            'mt-3 w-full min-w-0 rounded-xl border border-[#e8e9ec] bg-[#f7f7f8] overflow-hidden shadow-sm',
+                          'aria-label': '추천 질문',
+                        },
+                          h('p', { className: 'px-3 pt-3 pb-2 text-[11px] font-medium tracking-wide text-[#9ca3af]' }, '질문하기'),
+                          h(
+                            'div',
+                            { className: 'divide-y divide-[#e8e9ec]' },
+                            ...guideList.map((prompt, gi) =>
+                              h(
+                                'button',
+                                {
+                                  key: 'explore-guide-' + guideSid + '-' + gi,
+                                  type: 'button',
+                                  disabled: isSearching,
+                                  onClick: () => void handleExploreSearch(prompt),
+                                  className:
+                                    'w-full flex gap-2.5 items-start text-left px-3 py-3 sm:py-3.5 transition-colors hover:bg-[#efeff1] active:bg-[#e8e9ec]/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#111]/10 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent',
+                                },
+                                h('span', {
+                                  className: 'text-[15px] leading-[1.35] text-[#c5c9d1] flex-shrink-0 select-none',
+                                  'aria-hidden': true,
+                                }, '↳'),
+                                h('span', { className: 'text-[13px] font-normal leading-relaxed text-[#1f1f1f] min-w-0 flex-1' }, prompt)
+                              )
                             )
                           )
                         )
@@ -4923,10 +5313,22 @@ function App() {
         isSearching
           ? h('div', { className: 'flex justify-start w-full animate-fadeIn' },
               h('div', { className: 'flex gap-2 items-center max-w-[min(100%,360px)]' },
-                h('div', {
+                h('button', {
+                  type: 'button',
                   className:
-                    'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-lg border border-white/90 ' +
-                    getStylistById(selectedStylistId).avatarClass,
+                    'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-lg border border-white/90 touch-manipulation select-none p-0 ' +
+                    getStylistById(selectedStylistId).avatarClass +
+                    ' focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111]/20 focus-visible:ring-offset-2',
+                  'aria-label': getStylistById(selectedStylistId).name + ', 길게 눌러 변경',
+                  onPointerDown: (e) => {
+                    if (e.pointerType === 'mouse' && e.button !== 0) return;
+                    scheduleOpenStylistPersonaFromAvatar(selectedStylistId);
+                  },
+                  onPointerUp: clearStylistAvatarLongPress,
+                  onPointerCancel: clearStylistAvatarLongPress,
+                  onPointerLeave: clearStylistAvatarLongPress,
+                  onLostPointerCapture: clearStylistAvatarLongPress,
+                  onContextMenu: (e) => e.preventDefault(),
                 }, getStylistById(selectedStylistId).emoji),
                 h('div', { className: 'flex gap-2 items-center rounded-2xl rounded-tl-md border border-[#ebebeb] bg-white px-3 py-2.5 shadow-sm flex-1 min-w-0' },
                   h(Loader2, { size: 15, className: 'animate-spin text-[#888] shrink-0' }),
@@ -5106,28 +5508,6 @@ function App() {
             '옷장'
           ),
           h('p', { className: 'text-[#888] text-sm mt-1 font-normal' }, '하트로 찜한 상품만 모아 보여요')
-        ),
-        h('div', { className: `relative mb-1 z-40`, ref: closetSearchPanelRef },
-          h('div', {
-            className: 'flex items-center gap-2 cursor-text',
-            onClick: () => setSearchOverlayOpen('closet'),
-          },
-            h('div', { className: 'flex-1 min-w-0 flex items-center gap-2.5 rounded-full border border-[#e0e0e0] bg-white pl-4 pr-4 py-2.5' },
-              h(Search, { size: 18, className: 'text-[#bbb] shrink-0', strokeWidth: 1.5 }),
-              h('input', {
-                type: 'search',
-                value: closetFeedSearchQuery,
-                onChange: (e) => setClosetFeedSearchQuery(e.target.value),
-                onFocus: () => setSearchOverlayOpen('closet'),
-                placeholder: '검색',
-                className: 'flex-1 min-w-0 bg-transparent text-[14px] text-[#111] placeholder:text-[#9ca3af] outline-none',
-                autoComplete: 'off',
-                enterKeyHint: 'search',
-                'aria-label': '검색',
-              })
-            )
-          ),
-          searchOverlayOpen === 'closet' ? renderSearchDropdownPanel('closet') : null
         ),
         h('div', {
           className: 'grid grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-4 gap-3 pt-1',
@@ -6228,7 +6608,7 @@ function App() {
         )
       : [];
     const exploreTiers = !q ? getExploreTierProducts(product) : null;
-    /** 무드 에셋 썸네일 + 실제 상품 메타(가격·쿠폰 등) — 비슷한 상품과 동일 카드 레이아웃 */
+    /** 추천 상품 행: 무드 에셋 썸네일 + 실제 상품 메타 — 비슷한 상품과 동일 카드 레이아웃 */
     const exploreRecommendedPicks = !q
       ? HOME_MOOD_BANNERS.map((b, i) => {
           const pid = b.feedProductIds[0];
@@ -6712,6 +7092,7 @@ function App() {
       setRelatedLabel('');
       setSearchShowMoreProducts(false);
       setExploreChatInput('');
+      setExplorePersonaChosen(true);
       closeStyleChatDrawer();
     };
     const loadLogPreset = (prompt) => {
@@ -6753,7 +7134,7 @@ function App() {
           },
             h('div', { className: 'w-10 h-10 rounded-xl bg-[#e8f0ff] flex items-center justify-center text-[22px] shrink-0 border border-pink-100' }, drawerStylist.emoji),
             h('div', { className: 'flex-1 min-w-0' },
-              h('p', { className: 'text-[14px] font-semibold text-[#111]' }, 'AI 페르소나'),
+              h('p', { className: 'text-[14px] font-semibold text-[#111]' }, 'AI 스타일리스트'),
               h('p', { className: 'text-[11px] text-[#888] mt-0.5' }, drawerStylist.name + ' · ' + drawerStylist.tags.slice(0, 2).join(' · '))
             ),
             h(ChevronRight, { size: 18, className: 'text-[#bbb] shrink-0' })
@@ -6796,7 +7177,8 @@ function App() {
     const nextI = (personaCarouselIndex + 1) % n;
     const isCurrent = cur.id === selectedStylistId;
     const confirmPersona = () => {
-      if (cur.id !== selectedStylistId) {
+      const resetChat = cur.id !== selectedStylistId || exploreMessages.length === 0;
+      if (resetChat) {
         setExploreMessages([{ role: 'assistant', content: cur.greeting, stylistId: cur.id }]);
         setExploreFilteredProducts([]);
         setRelatedProducts([]);
@@ -6805,6 +7187,7 @@ function App() {
         setExploreChatInput('');
       }
       setSelectedStylistId(cur.id);
+      setExplorePersonaChosen(true);
       setStylePersonaScreenOpen(false);
     };
     return h('div', { className: 'fixed inset-0 z-[105] flex flex-col bg-white' },
@@ -6860,12 +7243,19 @@ function App() {
       h('div', { className: 'fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-sm border-t border-[#ebebeb] pb-safe z-30' },
         h('button', {
           type: 'button',
-          onClick: isCurrent ? undefined : confirmPersona,
-          disabled: isCurrent,
+          onClick: explorePersonaChosen && isCurrent && exploreMessages.length > 0 ? undefined : confirmPersona,
+          disabled: explorePersonaChosen && isCurrent && exploreMessages.length > 0,
           className:
             'w-full max-w-lg mx-auto block py-3.5 rounded-2xl text-[15px] font-bold transition-colors ' +
-            (isCurrent ? 'bg-[#9ca3af] text-white cursor-default' : 'bg-[#111] text-white hover:bg-[#333]'),
-        }, isCurrent ? '현재 스타일리스트' : '스타일리스트 변경')
+            (explorePersonaChosen && isCurrent && exploreMessages.length > 0
+              ? 'bg-[#9ca3af] text-white cursor-default'
+              : 'bg-[#111] text-white hover:bg-[#333]'),
+        },
+          explorePersonaChosen && isCurrent && exploreMessages.length > 0
+            ? '현재 스타일리스트'
+            : !explorePersonaChosen
+              ? '이 스타일리스트로 시작'
+              : '스타일리스트 변경')
       )
     );
   };
